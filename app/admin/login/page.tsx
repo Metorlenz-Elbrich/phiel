@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState, type FormEvent } from "react";
+import { Suspense, useEffect, useState, type FormEvent } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -21,6 +21,13 @@ function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // En prod, NextAuth v5 redirige vers ?error=CredentialsSignin au lieu de
+  // retourner le code dans res.error — on lit donc aussi l'URL.
+  useEffect(() => {
+    const urlError = search.get("error");
+    if (urlError) setError("Identifiants incorrects.");
+  }, [search]);
+
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
@@ -31,11 +38,22 @@ function LoginForm() {
       redirect: false,
       callbackUrl,
     });
+
     setLoading(false);
+
     if (!res?.ok) {
-      setError("Email ou mot de passe incorrect");
+      const code = res?.error ?? "";
+
+      if (code.includes("rate_limited") || code.includes("RateLimited")) {
+        setError("Trop de tentatives. Réessayez dans 1 minute.");
+      } else if (code.includes("attempts_warning") || code.includes("AttemptsWarning")) {
+        setError("Identifiants incorrects. Encore 2 tentatives avant blocage.");
+      } else {
+        setError("Identifiants incorrects.");
+      }
       return;
     }
+
     router.push(callbackUrl);
     router.refresh();
   }
