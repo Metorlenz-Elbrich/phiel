@@ -1,0 +1,311 @@
+"use client";
+
+import { useEffect, useState, type ReactNode } from "react";
+
+export type FieldConfig = {
+  name: string;
+  label: string;
+  type: "text" | "textarea" | "number" | "select" | "tags" | "url" | "color";
+  options?: string[];
+  max?: number;
+  required?: boolean;
+};
+
+type Doc = Record<string, unknown> & { _id: string };
+
+export function EntityTable({
+  title,
+  resource,
+  fields,
+  defaults,
+}: {
+  title: string;
+  resource: string;
+  fields: FieldConfig[];
+  defaults: Record<string, unknown>;
+}) {
+  const [items, setItems] = useState<Doc[]>([]);
+  const [editing, setEditing] = useState<Doc | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  async function load() {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/admin/${resource}`);
+      if (!res.ok) throw new Error("load failed");
+      setItems(await res.json());
+    } catch {
+      setError("Impossible de charger les données.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resource]);
+
+  async function onDelete(id: string) {
+    if (!confirm("Supprimer cet élément ?")) return;
+    const res = await fetch(`/api/admin/${resource}/${id}`, { method: "DELETE" });
+    if (res.ok) load();
+    else alert("Suppression refusée.");
+  }
+
+  return (
+    <div className="space-y-6">
+      <header className="flex items-center justify-between">
+        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+        <button
+          type="button"
+          onClick={() => {
+            setEditing(null);
+            setCreating(true);
+          }}
+          className="rounded-full px-4 py-2 text-sm font-medium text-white"
+          style={{ background: "linear-gradient(135deg,#0066cc,#00d4ff)" }}
+        >
+          + Ajouter
+        </button>
+      </header>
+
+      {error && <p className="text-sm text-red-400">{error}</p>}
+
+      {(creating || editing) && (
+        <EntityForm
+          fields={fields}
+          initial={editing ?? defaults}
+          onCancel={() => {
+            setCreating(false);
+            setEditing(null);
+          }}
+          onSubmit={async (data) => {
+            const url = editing
+              ? `/api/admin/${resource}/${editing._id}`
+              : `/api/admin/${resource}`;
+            const method = editing ? "PUT" : "POST";
+            const res = await fetch(url, {
+              method,
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(data),
+            });
+            if (!res.ok) {
+              const body = await res.json().catch(() => ({}));
+              alert(body.error ?? "Échec de l'enregistrement.");
+              return;
+            }
+            setCreating(false);
+            setEditing(null);
+            load();
+          }}
+        />
+      )}
+
+      {loading ? (
+        <p className="text-sm text-white/50">Chargement...</p>
+      ) : (
+        <div
+          className="rounded-2xl border overflow-hidden"
+          style={{ borderColor: "rgba(0,212,255,0.12)" }}
+        >
+          <table className="w-full text-sm">
+            <thead style={{ background: "rgba(0,212,255,0.08)" }}>
+              <tr>
+                {fields.slice(0, 3).map((f) => (
+                  <th key={f.name} className="px-4 py-3 text-left font-medium">
+                    {f.label}
+                  </th>
+                ))}
+                <th className="px-4 py-3 text-right" />
+              </tr>
+            </thead>
+            <tbody>
+              {items.length === 0 && (
+                <tr>
+                  <td colSpan={fields.slice(0, 3).length + 1} className="px-4 py-6 text-center text-white/50">
+                    Aucun élément.
+                  </td>
+                </tr>
+              )}
+              {items.map((it) => (
+                <tr
+                  key={it._id}
+                  className="border-t"
+                  style={{ borderColor: "rgba(255,255,255,0.06)" }}
+                >
+                  {fields.slice(0, 3).map((f) => (
+                    <td key={f.name} className="px-4 py-3 align-top">
+                      <Cell value={it[f.name]} />
+                    </td>
+                  ))}
+                  <td className="px-4 py-3 text-right whitespace-nowrap">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCreating(false);
+                        setEditing(it);
+                      }}
+                      className="mr-2 rounded-full border px-3 py-1 text-xs text-white/80 hover:text-[#00d4ff] hover:border-[#00d4ff]"
+                      style={{ borderColor: "rgba(255,255,255,0.18)" }}
+                    >
+                      Modifier
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onDelete(it._id)}
+                      className="rounded-full border px-3 py-1 text-xs text-red-400 hover:bg-red-500/10"
+                      style={{ borderColor: "rgba(248,113,113,0.4)" }}
+                    >
+                      Supprimer
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Cell({ value }: { value: unknown }): ReactNode {
+  if (value == null) return <span className="text-white/30">—</span>;
+  if (Array.isArray(value)) return value.join(", ");
+  if (typeof value === "string" && value.length > 80) return value.slice(0, 80) + "…";
+  return String(value);
+}
+
+function EntityForm({
+  fields,
+  initial,
+  onSubmit,
+  onCancel,
+}: {
+  fields: FieldConfig[];
+  initial: Record<string, unknown>;
+  onSubmit: (data: Record<string, unknown>) => Promise<void>;
+  onCancel: () => void;
+}) {
+  const [data, setData] = useState<Record<string, unknown>>(() => ({ ...initial }));
+  const [submitting, setSubmitting] = useState(false);
+
+  function setField(name: string, value: unknown) {
+    setData((d) => ({ ...d, [name]: value }));
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      const payload: Record<string, unknown> = {};
+      for (const f of fields) {
+        const raw = data[f.name];
+        if (f.type === "tags") {
+          payload[f.name] = typeof raw === "string"
+            ? raw.split(",").map((s) => s.trim()).filter(Boolean)
+            : raw ?? [];
+        } else if (f.type === "number") {
+          payload[f.name] = raw === "" || raw == null ? 0 : Number(raw);
+        } else {
+          payload[f.name] = raw ?? "";
+        }
+      }
+      await onSubmit(payload);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="rounded-2xl border p-6 space-y-4"
+      style={{
+        background: "rgba(255,255,255,0.03)",
+        borderColor: "rgba(0,212,255,0.18)",
+      }}
+    >
+      <div className="grid gap-4 md:grid-cols-2">
+        {fields.map((f) => (
+          <label key={f.name} className={f.type === "textarea" ? "md:col-span-2 block" : "block"}>
+            <span className="mb-1 block text-xs font-medium uppercase tracking-wider text-white/70">
+              {f.label}
+            </span>
+            {f.type === "textarea" ? (
+              <textarea
+                value={String(data[f.name] ?? "")}
+                onChange={(e) => setField(f.name, e.target.value)}
+                maxLength={f.max}
+                rows={3}
+                required={f.required}
+                className="w-full rounded-lg border bg-black/20 px-3 py-2 text-sm outline-none focus:border-[#00d4ff]"
+                style={{ borderColor: "rgba(255,255,255,0.12)" }}
+              />
+            ) : f.type === "select" ? (
+              <select
+                value={String(data[f.name] ?? "")}
+                onChange={(e) => setField(f.name, e.target.value)}
+                required={f.required}
+                className="w-full rounded-lg border bg-black/20 px-3 py-2 text-sm outline-none focus:border-[#00d4ff]"
+                style={{ borderColor: "rgba(255,255,255,0.12)" }}
+              >
+                <option value="">—</option>
+                {f.options?.map((o) => (
+                  <option key={o} value={o}>
+                    {o}
+                  </option>
+                ))}
+              </select>
+            ) : f.type === "tags" ? (
+              <input
+                type="text"
+                value={
+                  Array.isArray(data[f.name])
+                    ? (data[f.name] as string[]).join(", ")
+                    : String(data[f.name] ?? "")
+                }
+                onChange={(e) => setField(f.name, e.target.value)}
+                placeholder="ex: Next.js, React, Tailwind"
+                className="w-full rounded-lg border bg-black/20 px-3 py-2 text-sm outline-none focus:border-[#00d4ff]"
+                style={{ borderColor: "rgba(255,255,255,0.12)" }}
+              />
+            ) : (
+              <input
+                type={f.type === "number" ? "number" : f.type === "url" ? "url" : f.type === "color" ? "color" : "text"}
+                value={String(data[f.name] ?? "")}
+                onChange={(e) => setField(f.name, e.target.value)}
+                maxLength={f.max}
+                required={f.required}
+                className="w-full rounded-lg border bg-black/20 px-3 py-2 text-sm outline-none focus:border-[#00d4ff]"
+                style={{ borderColor: "rgba(255,255,255,0.12)" }}
+              />
+            )}
+          </label>
+        ))}
+      </div>
+      <div className="flex justify-end gap-2 pt-2">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="rounded-full border px-4 py-2 text-sm text-white/80"
+          style={{ borderColor: "rgba(255,255,255,0.18)" }}
+        >
+          Annuler
+        </button>
+        <button
+          type="submit"
+          disabled={submitting}
+          className="rounded-full px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          style={{ background: "linear-gradient(135deg,#0066cc,#00d4ff)" }}
+        >
+          {submitting ? "..." : "Enregistrer"}
+        </button>
+      </div>
+    </form>
+  );
+}
