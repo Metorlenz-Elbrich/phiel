@@ -10,9 +10,8 @@ import "@fontsource/space-grotesk/700.css";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LanguageProvider } from "@/lib/language-context";
-import { NavBar } from "@/components/ui/nav-bar";
-import { Footer } from "@/components/ui/footer";
 import { LoadingScreen } from "@/components/ui/loading-screen";
+import { ConditionalLayout } from "@/components/ui/conditional-layout";
 import { SITE } from "@/lib/data";
 
 export const viewport: Viewport = {
@@ -88,9 +87,9 @@ export default function RootLayout({
         <ThemeProvider>
           <LanguageProvider>
             <LoadingScreen />
-            <NavBar />
-            <main className="flex-1">{children}</main>
-            <Footer />
+            <ConditionalLayout>
+              <main className="flex-1">{children}</main>
+            </ConditionalLayout>
           </LanguageProvider>
         </ThemeProvider>
       </body>
