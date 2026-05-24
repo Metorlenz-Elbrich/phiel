@@ -42,6 +42,7 @@ export async function POST() {
         name: s.name,
         level: s.level,
         category: s.category,
+        devicon: s.devicon ?? "",
         order: i,
       }));
       results.skills = (await Skill.insertMany(docs)).length;

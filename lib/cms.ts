@@ -20,9 +20,7 @@ import {
   TEAM as STATIC_TEAM,
   TESTIMONIALS as STATIC_TESTIMONIALS,
   type ServiceIcon,
-  type SkillCategory,
   type StatIcon,
-  type PortfolioCategory,
 } from "@/lib/data";
 
 const REVALIDATE = 60;
@@ -35,7 +33,7 @@ export type CmsService = {
   features: string[];
 };
 
-export type CmsSkill = { name: string; level: number; category: SkillCategory };
+export type CmsSkill = { name: string; level: number; category: string; devicon?: string };
 
 export type CmsStat = {
   label: string;
@@ -48,11 +46,12 @@ export type CmsStat = {
 export type CmsProject = {
   id: string;
   title: string;
-  category: Exclude<PortfolioCategory, "Tous">;
+  category: string;
   description: string;
   tags: string[];
   link?: string;
   repo?: string;
+  imageUrl?: string;
   gradient: [string, string];
 };
 
@@ -101,7 +100,8 @@ export const getSkills = unstable_cache(
       return docs.map((d) => ({
         name: d.name as string,
         level: d.level as number,
-        category: d.category as SkillCategory,
+        category: d.category as string,
+        devicon: (d.devicon as string) || undefined,
       }));
     }, STATIC_SKILLS.map((s) => ({ ...s }))),
   ["cms:skills"],
@@ -144,17 +144,28 @@ export const getProjects = unstable_cache(
       return docs.map((d) => ({
         id: String(d._id),
         title: d.title as string,
-        category: d.category as Exclude<PortfolioCategory, "Tous">,
+        category: d.category as string,
         description: d.description as string,
         tags: (d.tags as string[]) ?? [],
         link: d.link as string | undefined,
         repo: d.repo as string | undefined,
+        imageUrl: (d.imageUrl as string) || undefined,
         gradient: [
           (d.gradient as string[])?.[0] ?? "#0066cc",
           (d.gradient as string[])?.[1] ?? "#00d4ff",
         ] as [string, string],
       }));
-    }, STATIC_PORTFOLIO.map((p) => ({ ...p }))),
+    }, STATIC_PORTFOLIO.map((p): CmsProject => ({
+      id: p.id,
+      title: p.title,
+      category: p.category,
+      description: p.description,
+      tags: p.tags,
+      link: p.link,
+      repo: p.repo,
+      imageUrl: undefined,
+      gradient: p.gradient,
+    }))),
   ["cms:projects"],
   { revalidate: REVALIDATE, tags: ["cms:projects"] }
 );

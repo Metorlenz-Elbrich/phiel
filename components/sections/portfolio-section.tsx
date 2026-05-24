@@ -72,20 +72,30 @@ export function PortfolioSection({ projects: allProjects }: { projects: CmsProje
                   <div
                     className="mb-5 aspect-[16/10] w-full rounded-xl border border-white/10 grid place-items-center text-white relative overflow-hidden"
                     style={{
-                      background: `linear-gradient(135deg, ${p.gradient[0]}, ${p.gradient[1]})`,
+                      background: p.imageUrl ? "#07101f" : `linear-gradient(135deg, ${p.gradient[0]}, ${p.gradient[1]})`,
                     }}
                   >
-                    <span
-                      aria-hidden
-                      className="absolute inset-0 opacity-30 mix-blend-overlay"
-                      style={{
-                        backgroundImage:
-                          "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.5), transparent 40%), radial-gradient(circle at 80% 70%, rgba(0,0,0,0.4), transparent 50%)",
-                      }}
-                    />
-                    <span className="relative text-5xl font-display font-semibold drop-shadow-lg">
-                      {p.title.slice(0, 2)}
-                    </span>
+                    {p.imageUrl ? (
+                      <img
+                        src={p.imageUrl}
+                        alt={p.title}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <>
+                        <span
+                          aria-hidden
+                          className="absolute inset-0 opacity-30 mix-blend-overlay"
+                          style={{
+                            backgroundImage:
+                              "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.5), transparent 40%), radial-gradient(circle at 80% 70%, rgba(0,0,0,0.4), transparent 50%)",
+                          }}
+                        />
+                        <span className="relative text-5xl font-display font-semibold drop-shadow-lg">
+                          {p.title.slice(0, 2)}
+                        </span>
+                      </>
+                    )}
                   </div>
                   <div className="flex items-center justify-between gap-2">
                     <h3 className="text-lg font-semibold tracking-tight">{p.title}</h3>

@@ -26,7 +26,9 @@ export const SOCIALS = [
   { label: "Instagram", href: "https://instagram.com/", icon: "instagram" as const },
 ];
 
-export type ServiceIcon = "branding" | "web" | "mobile";
+export type ServiceIcon =
+  | "palette" | "code" | "smartphone" | "sparkle" | "server" | "mail"
+  | "branding" | "web" | "mobile"; // legacy
 export const SERVICES: {
   id: string;
   icon: ServiceIcon;
@@ -65,19 +67,20 @@ export const SKILLS: {
   name: string;
   level: number;
   category: SkillCategory;
+  devicon: string;
 }[] = [
-  { name: "HTML5",      level: 95, category: "Front-end" },
-  { name: "CSS3",       level: 92, category: "Front-end" },
-  { name: "JavaScript", level: 90, category: "Front-end" },
-  { name: "React",      level: 88, category: "Front-end" },
-  { name: "TypeScript", level: 82, category: "Front-end" },
-  { name: "PHP",        level: 80, category: "Back-end" },
-  { name: "Laravel",    level: 82, category: "Back-end" },
-  { name: "Node.js",    level: 78, category: "Back-end" },
-  { name: "Flutter",    level: 86, category: "Mobile" },
-  { name: "Kotlin",     level: 75, category: "Mobile" },
-  { name: "Adobe CC",   level: 88, category: "Design" },
-  { name: "Figma",      level: 85, category: "Design" },
+  { name: "HTML5",      level: 95, category: "Front-end", devicon: "html5" },
+  { name: "CSS3",       level: 92, category: "Front-end", devicon: "css3" },
+  { name: "JavaScript", level: 90, category: "Front-end", devicon: "javascript" },
+  { name: "React",      level: 88, category: "Front-end", devicon: "react" },
+  { name: "TypeScript", level: 82, category: "Front-end", devicon: "typescript" },
+  { name: "PHP",        level: 80, category: "Back-end",  devicon: "php" },
+  { name: "Laravel",    level: 82, category: "Back-end",  devicon: "laravel" },
+  { name: "Node.js",    level: 78, category: "Back-end",  devicon: "nodejs" },
+  { name: "Flutter",    level: 86, category: "Mobile",    devicon: "flutter" },
+  { name: "Kotlin",     level: 75, category: "Mobile",    devicon: "kotlin" },
+  { name: "Adobe CC",   level: 88, category: "Design",    devicon: "photoshop" },
+  { name: "Figma",      level: 85, category: "Design",    devicon: "figma" },
 ];
 
 export type StatIcon = "sparkle" | "smartphone" | "code" | "palette";

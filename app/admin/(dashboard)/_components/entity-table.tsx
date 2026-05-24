@@ -2,11 +2,16 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 
+export type IconOption = { value: string; label: string; emoji: string };
+export type DeviconOption = { value: string; label: string };
+
 export type FieldConfig = {
   name: string;
   label: string;
-  type: "text" | "textarea" | "number" | "select" | "tags" | "url" | "color";
+  type: "text" | "textarea" | "number" | "select" | "tags" | "url" | "color" | "icon-picker" | "devicon" | "image-url";
   options?: string[];
+  iconOptions?: IconOption[];
+  deviconOptions?: DeviconOption[];
   max?: number;
   required?: boolean;
 };
@@ -232,7 +237,14 @@ function EntityForm({
     >
       <div className="grid gap-4 md:grid-cols-2">
         {fields.map((f) => (
-          <label key={f.name} className={f.type === "textarea" ? "md:col-span-2 block" : "block"}>
+          <label
+            key={f.name}
+            className={
+              f.type === "textarea" || f.type === "icon-picker" || f.type === "image-url"
+                ? "md:col-span-2 block"
+                : "block"
+            }
+          >
             <span className="mb-1 block text-xs font-medium uppercase tracking-wider text-white/70">
               {f.label}
             </span>
@@ -274,6 +286,67 @@ function EntityForm({
                 className="w-full rounded-lg border bg-black/20 px-3 py-2 text-sm outline-none focus:border-[#00d4ff]"
                 style={{ borderColor: "rgba(255,255,255,0.12)" }}
               />
+            ) : f.type === "icon-picker" ? (
+              <div className="flex flex-wrap gap-2 pt-1">
+                {(f.iconOptions ?? []).map((opt) => {
+                  const selected = data[f.name] === opt.value;
+                  return (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setField(f.name, opt.value)}
+                      className="flex flex-col items-center gap-1 rounded-xl border px-3 py-2 text-xs transition-all"
+                      style={{
+                        borderColor: selected ? "#00d4ff" : "rgba(255,255,255,0.12)",
+                        background: selected ? "rgba(0,212,255,0.12)" : "rgba(0,0,0,0.2)",
+                        boxShadow: selected ? "0 0 8px rgba(0,212,255,0.3)" : "none",
+                        color: selected ? "#00d4ff" : "rgba(255,255,255,0.6)",
+                      }}
+                    >
+                      <span style={{ fontSize: "20px" }}>{opt.emoji}</span>
+                      <span style={{ fontSize: "10px", textAlign: "center", maxWidth: "64px" }}>{opt.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : f.type === "devicon" ? (
+              <div className="flex items-center gap-3">
+                <select
+                  value={String(data[f.name] ?? "")}
+                  onChange={(e) => setField(f.name, e.target.value)}
+                  className="flex-1 rounded-lg border bg-black/20 px-3 py-2 text-sm outline-none focus:border-[#00d4ff]"
+                  style={{ borderColor: "rgba(255,255,255,0.12)" }}
+                >
+                  <option value="">— aucune —</option>
+                  {(f.deviconOptions ?? []).map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
+                </select>
+                {!!data[f.name] && (
+                  <i
+                    className={`devicon-${String(data[f.name])}-plain colored`}
+                    style={{ fontSize: "28px", flexShrink: 0 }}
+                  />
+                )}
+              </div>
+            ) : f.type === "image-url" ? (
+              <div className="space-y-2">
+                <input
+                  type="url"
+                  value={String(data[f.name] ?? "")}
+                  onChange={(e) => setField(f.name, e.target.value)}
+                  placeholder="https://..."
+                  className="w-full rounded-lg border bg-black/20 px-3 py-2 text-sm outline-none focus:border-[#00d4ff]"
+                  style={{ borderColor: "rgba(255,255,255,0.12)" }}
+                />
+                {!!(data[f.name] && String(data[f.name]).startsWith("http")) && (
+                  <img
+                    src={String(data[f.name])}
+                    alt="preview"
+                    style={{ height: "60px", borderRadius: "8px", objectFit: "cover" }}
+                  />
+                )}
+              </div>
             ) : (
               <input
                 type={f.type === "number" ? "number" : f.type === "url" ? "url" : f.type === "color" ? "color" : "text"}

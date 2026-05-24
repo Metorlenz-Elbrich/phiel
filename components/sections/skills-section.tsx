@@ -25,6 +25,7 @@ type SkillTreeNode = {
   name: string;
   pct: number;
   icon: string;
+  devicon?: string;
   tier: "legendary" | "epic" | "rare";
 };
 
@@ -34,19 +35,27 @@ function levelToTier(level: number): SkillTreeNode["tier"] {
   return "rare";
 }
 
+const FALLBACK_COLORS = ["#e879f9", "#34d399", "#fb923c", "#a3e635"];
+
 function buildTree(skills: CmsSkill[]) {
-  const byCat = new Map<SkillCategory, CmsSkill[]>();
+  const byCat = new Map<string, CmsSkill[]>();
   for (const s of skills) {
     if (!byCat.has(s.category)) byCat.set(s.category, []);
     byCat.get(s.category)!.push(s);
   }
-  return CATEGORY_ORDER.filter((c) => byCat.has(c)).map((cat) => ({
+  // Connus d'abord, puis catégories dynamiques
+  const known = CATEGORY_ORDER.filter((c) => byCat.has(c));
+  const dynamic = Array.from(byCat.keys()).filter((c) => !CATEGORY_ORDER.includes(c as SkillCategory));
+  const allCats = [...known, ...dynamic];
+
+  return allCats.map((cat, idx) => ({
     category: cat,
-    color: CATEGORY_COLORS[cat],
+    color: CATEGORY_COLORS[cat as SkillCategory] ?? FALLBACK_COLORS[idx % FALLBACK_COLORS.length],
     nodes: byCat.get(cat)!.map((s) => ({
       name: s.name,
       pct: s.level,
       icon: SKILL_ICONS[s.name] ?? "⭐",
+      devicon: s.devicon || undefined,
       tier: levelToTier(s.level),
     })),
   }));
@@ -115,8 +124,15 @@ function SkillNode({ node, catColor, visible, delay }: {
           (e.currentTarget as HTMLDivElement).style.boxShadow = t.glow;
         }}
       >
-        {/* Icon */}
-        <span style={{ fontSize: "22px", lineHeight: 1 }}>{node.icon}</span>
+        {/* Icon — devicon si dispo, sinon emoji fallback */}
+        {node.devicon ? (
+          <i
+            className={`devicon-${node.devicon}-plain colored`}
+            style={{ fontSize: "22px", lineHeight: 1 }}
+          />
+        ) : (
+          <span style={{ fontSize: "22px", lineHeight: 1 }}>{node.icon}</span>
+        )}
 
         {/* Percentage */}
         <span

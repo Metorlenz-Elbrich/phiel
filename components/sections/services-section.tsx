@@ -1,17 +1,24 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { type ServiceIcon } from "@/lib/data";
 import type { CmsService } from "@/lib/cms";
 import { Icon, type IconName } from "@/components/ui/icon";
 import { Card } from "@/components/ui/card";
 import { SectionHeading } from "./section-heading";
 import { useLang } from "@/lib/language-context";
 
-const ICONS: Record<ServiceIcon, IconName> = {
+const ICON_MAP: Record<string, IconName> = {
+  // Nouvelles valeurs (IconName directes)
+  palette:    "palette",
+  code:       "code",
+  smartphone: "smartphone",
+  sparkle:    "sparkle",
+  server:     "code",       // pas de server dans IconName — fallback code
+  mail:       "mail",
+  // Valeurs legacy
   branding: "palette",
-  web: "code",
-  mobile: "smartphone",
+  web:      "code",
+  mobile:   "smartphone",
 };
 
 export function ServicesSection({ services }: { services: CmsService[] }) {
@@ -53,7 +60,7 @@ export function ServicesSection({ services }: { services: CmsService[] }) {
             >
               <Card interactive className="h-full">
                 <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-phi-gradient text-white">
-                  <Icon name={ICONS[s.icon]} size={22} />
+                  <Icon name={ICON_MAP[s.icon] ?? "sparkle"} size={22} />
                 </div>
                 <h3 className="text-xl font-semibold tracking-tight">{s.title}</h3>
                 <p className="mt-2 text-sm text-foreground/70">{s.description}</p>

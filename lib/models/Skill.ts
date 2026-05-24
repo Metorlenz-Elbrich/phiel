@@ -4,12 +4,8 @@ const SkillSchema = new Schema(
   {
     name: { type: String, required: true, maxlength: 80, trim: true },
     level: { type: Number, required: true, min: 0, max: 100 },
-    category: {
-      type: String,
-      enum: ["Front-end", "Back-end", "Mobile", "Design"],
-      required: true,
-      index: true,
-    },
+    category: { type: String, required: true, index: true },
+    devicon: { type: String, default: "" },
     order: { type: Number, default: 0, index: true },
   },
   { timestamps: true }
