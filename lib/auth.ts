@@ -1,4 +1,4 @@
-import NextAuth, { type DefaultSession } from "next-auth";
+import NextAuth, { CredentialsSignin, type DefaultSession } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { RateLimiterMemory } from "rate-limiter-flexible";
@@ -10,7 +10,7 @@ import { securityLog, getClientIp } from "@/lib/security-log";
  * - bcrypt salt rounds = 12 (hash en mémoire au boot).
  * - JWT session 8 h.
  * - Cookies httpOnly + secure + sameSite=strict.
- * - Message d'erreur générique (return null) côté authorize().
+ * - Erreurs typées via CredentialsSignin — codes exploitables côté client.
  * - Rate limit 5/IP/15min — OWASP A04.
  */
 
@@ -23,8 +23,18 @@ declare module "next-auth" {
 const loginLimiter = new RateLimiterMemory({
   points: 5,
   duration: 15 * 60,
-  blockDuration: 15 * 60,
+  blockDuration: 60,
 });
+
+class InvalidCredentials extends CredentialsSignin {
+  code = "invalid_credentials";
+}
+class RateLimited extends CredentialsSignin {
+  code = "rate_limited";
+}
+class AttemptsWarning extends CredentialsSignin {
+  code = "attempts_warning";
+}
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -64,37 +74,43 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const ip = getClientIp(req as unknown as Request);
 
         try {
-          await loginLimiter.consume(ip);
-        } catch {
+          const rateLimitResult = await loginLimiter.consume(ip);
+          const remaining = rateLimitResult.remainingPoints;
+
+          // Valider les credentials.
+          const parsed = LoginSchema.safeParse(creds);
+          if (!parsed.success) {
+            securityLog.loginFailed({ ip });
+            if (remaining <= 2) throw new AttemptsWarning();
+            throw new InvalidCredentials();
+          }
+
+          const { email, password } = parsed.data;
+          const expectedEmail = process.env.ADMIN_EMAIL;
+          const expectedHash = await getAdminPasswordHash();
+
+          if (!expectedEmail || !expectedHash) {
+            throw new InvalidCredentials();
+          }
+
+          // bcrypt.compare exécuté quel que soit l'email — protection timing.
+          const validHash = await bcrypt.compare(password, expectedHash);
+          const emailMatch = email.toLowerCase() === expectedEmail.toLowerCase();
+
+          if (!emailMatch || !validHash) {
+            securityLog.loginFailed({ ip, email });
+            if (remaining <= 2) throw new AttemptsWarning();
+            throw new InvalidCredentials();
+          }
+
+          return { id: "admin", email };
+        } catch (e) {
+          // Erreurs custom : on les propage telles quelles.
+          if (e instanceof CredentialsSignin) throw e;
+          // Sinon c'est le rate limiter (consume rejette) — blocage IP.
           securityLog.loginBlocked({ ip, reason: "rate_limit" });
-          return null;
+          throw new RateLimited();
         }
-
-        const parsed = LoginSchema.safeParse(creds);
-        if (!parsed.success) {
-          securityLog.loginFailed({ ip });
-          return null;
-        }
-
-        const { email, password } = parsed.data;
-        const expectedEmail = process.env.ADMIN_EMAIL;
-        const expectedHash = await getAdminPasswordHash();
-
-        if (!expectedEmail || !expectedHash) {
-          securityLog.loginFailed({ ip, email });
-          return null;
-        }
-
-        // bcrypt.compare exécuté quel que soit l'email — protection timing.
-        const validHash = await bcrypt.compare(password, expectedHash);
-        const emailMatch = email.toLowerCase() === expectedEmail.toLowerCase();
-
-        if (!emailMatch || !validHash) {
-          securityLog.loginFailed({ ip, email });
-          return null;
-        }
-
-        return { id: "admin", email };
       },
     }),
   ],
