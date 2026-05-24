@@ -10,9 +10,13 @@ export async function proxy(req: NextRequest) {
   // API auth est toujours publique  
   if (pathname.startsWith("/api/auth")) return NextResponse.next();
 
+  const isProd = process.env.NODE_ENV === "production";
   const token = await getToken({
     req,
     secret: process.env.NEXTAUTH_SECRET,
+    cookieName: isProd
+      ? "__Secure-authjs.session-token"
+      : "authjs.session-token",
   });
 
   if (!token) {
