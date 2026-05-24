@@ -17,8 +17,8 @@ function initials(name: string) {
 }
 
 export function TeamSection({ team }: { team: CmsTeamMember[] }) {
-  const { t } = useLang();
-  const TEAM = team;
+  const { lang, t } = useLang();
+
   return (
     <section
       id="team"
@@ -36,41 +36,46 @@ export function TeamSection({ team }: { team: CmsTeamMember[] }) {
         />
 
         <div className="grid gap-8 lg:grid-cols-2 lg:items-stretch">
-          {TEAM.map((m, i) => (
-            <motion.div
-              key={m.name}
-              initial={{ opacity: 0, y: 18 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.5, delay: i * 0.08 }}
-            >
-              <Card interactive className="h-full">
-                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
-                  <div className="grid h-24 w-24 shrink-0 place-items-center rounded-full bg-phi-gradient text-white text-2xl font-semibold tracking-wide shadow-[0_12px_30px_-10px_rgba(0,212,255,0.55)]">
-                    {initials(m.name)}
+          {team.map((m, i) => {
+            const name = lang === "en" && m.name_en ? m.name_en : m.name_fr;
+            const role = lang === "en" && m.role_en ? m.role_en : m.role_fr;
+            const bio  = lang === "en" && m.bio_en  ? m.bio_en  : m.bio_fr;
+            return (
+              <motion.div
+                key={m.name_fr}
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.5, delay: i * 0.08 }}
+              >
+                <Card interactive className="h-full">
+                  <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
+                    <div className="grid h-24 w-24 shrink-0 place-items-center rounded-full bg-phi-gradient text-white text-2xl font-semibold tracking-wide shadow-[0_12px_30px_-10px_rgba(0,212,255,0.55)]">
+                      {initials(name)}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-semibold tracking-tight">{name}</h3>
+                      <p className="text-sm font-medium text-phi-cyan">{role}</p>
+                      <p className="mt-3 text-sm text-foreground/70">{bio}</p>
+                      {m.linkedin && (
+                        <a
+                          href={m.linkedin}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`LinkedIn ${lang === "en" ? "of" : "de"} ${name}`}
+                          className="mt-4 inline-flex h-9 items-center gap-2 rounded-full border border-[color:var(--border)] px-3 text-xs font-medium text-foreground/80 hover:text-phi-cyan hover:border-phi-cyan/60"
+                        >
+                          <Icon name="linkedin" size={14} /> LinkedIn
+                        </a>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="text-xl font-semibold tracking-tight">{m.name}</h3>
-                    <p className="text-sm font-medium text-phi-cyan">{m.role}</p>
-                    <p className="mt-3 text-sm text-foreground/70">{m.bio}</p>
-                    {m.linkedin && (
-                      <a
-                        href={m.linkedin}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={`LinkedIn de ${m.name}`}
-                        className="mt-4 inline-flex h-9 items-center gap-2 rounded-full border border-[color:var(--border)] px-3 text-xs font-medium text-foreground/80 hover:text-phi-cyan hover:border-phi-cyan/60"
-                      >
-                        <Icon name="linkedin" size={14} /> LinkedIn
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-          ))}
+                </Card>
+              </motion.div>
+            );
+          })}
 
-          {/* Carte "Équipe en expansion" — recrutement */}
+          {/* Carte recrutement */}
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}

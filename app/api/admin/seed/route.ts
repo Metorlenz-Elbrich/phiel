@@ -1,5 +1,5 @@
 /**
- * POST /api/admin/seed — importe lib/data.ts dans MongoDB.
+ * POST /api/admin/seed — importe lib/data.ts dans MongoDB (bilingue FR/EN).
  * Idempotent : ne fait rien si la collection contient déjà des docs.
  */
 
@@ -28,76 +28,90 @@ export async function POST() {
 
     if ((await Service.countDocuments()) === 0) {
       const docs = SERVICES.map((s, i) => ({
-        icon: s.icon,
-        title: s.title,
-        description: s.description,
-        features: s.features,
-        order: i,
+        icon:           s.icon,
+        title_fr:       s.title,
+        title_en:       "",
+        description_fr: s.description,
+        description_en: "",
+        features_fr:    s.features,
+        features_en:    [],
+        order:          i,
       }));
       results.services = (await Service.insertMany(docs)).length;
     }
 
     if ((await Skill.countDocuments()) === 0) {
       const docs = SKILLS.map((s, i) => ({
-        name: s.name,
-        level: s.level,
+        name_fr:  s.name,
+        name_en:  "",
+        level:    s.level,
         category: s.category,
-        devicon: s.devicon ?? "",
-        order: i,
+        devicon:  s.devicon ?? "",
+        order:    i,
       }));
       results.skills = (await Skill.insertMany(docs)).length;
     }
 
     if ((await Stat.countDocuments()) === 0) {
       const docs = STATS.map((s, i) => ({
-        label: s.label,
-        value: s.value,
-        suffix: s.suffix ?? "+",
-        icon: s.icon,
-        color: STAT_COLORS[i % STAT_COLORS.length],
-        order: i,
+        label_fr: s.label,
+        label_en: "",
+        value:    s.value,
+        suffix:   s.suffix ?? "+",
+        icon:     s.icon,
+        color:    STAT_COLORS[i % STAT_COLORS.length],
+        order:    i,
       }));
       results.stats = (await Stat.insertMany(docs)).length;
     }
 
     if ((await Project.countDocuments()) === 0) {
       const docs = PORTFOLIO.map((p, i) => ({
-        title: p.title,
-        category: p.category,
-        description: p.description,
-        tags: p.tags,
-        link: p.link,
-        repo: p.repo,
-        gradient: p.gradient,
-        order: i,
+        title_fr:       p.title,
+        title_en:       "",
+        category:       p.category,
+        description_fr: p.description,
+        description_en: "",
+        tags:           p.tags,
+        link:           p.link,
+        repo:           p.repo,
+        imageUrl:       "",
+        gradient:       p.gradient,
+        order:          i,
       }));
       results.projects = (await Project.insertMany(docs)).length;
     }
 
     if ((await TeamMember.countDocuments()) === 0) {
       const docs = TEAM.map((m, i) => ({
-        name: m.name,
-        role: m.role,
-        bio: m.bio,
+        name_fr:  m.name,
+        name_en:  "",
+        role_fr:  m.role,
+        role_en:  "",
+        bio_fr:   m.bio,
+        bio_en:   "",
         linkedin: m.linkedin,
-        order: i,
+        order:    i,
       }));
       results.team = (await TeamMember.insertMany(docs)).length;
     }
 
     if ((await Testimonial.countDocuments()) === 0) {
       const docs = TESTIMONIALS.map((t, i) => ({
-        name: t.name,
-        role: t.role,
-        quote: t.quote,
-        order: i,
+        name_fr:  t.name,
+        name_en:  "",
+        role_fr:  t.role,
+        role_en:  "",
+        quote_fr: t.quote,
+        quote_en: "",
+        order:    i,
       }));
       results.testimonials = (await Testimonial.insertMany(docs)).length;
     }
 
     securityLog.adminAction({
-      userId: session.user.email ?? "admin",
-      action: "create",
+      userId:   session.user.email ?? "admin",
+      action:   "create",
       resource: "seed",
     });
 

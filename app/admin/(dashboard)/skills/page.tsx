@@ -30,11 +30,15 @@ export default function SkillsAdminPage() {
   const [newCat, setNewCat]         = useState("");
 
   const fields: FieldConfig[] = [
-    { name: "name",     label: "Nom",            type: "text",    max: 80,  required: true },
+    // Champs sans langGroup : toujours visibles
     { name: "category", label: "Catégorie",      type: "select",  options: categories, required: true },
-    { name: "level",    label: "Niveau (0–100)", type: "number",            required: true },
+    { name: "level",    label: "Niveau (0–100)", type: "number",                       required: true },
     { name: "devicon",  label: "Icône Devicon",  type: "devicon", deviconOptions: DEVICON_OPTIONS },
     { name: "order",    label: "Ordre",          type: "number" },
+    // Onglet FR
+    { name: "name_fr",  label: "Nom (FR)",       type: "text",    max: 80, required: true, langGroup: "fr" },
+    // Onglet EN
+    { name: "name_en",  label: "Name (EN)",      type: "text",    max: 80,               langGroup: "en" },
   ];
 
   function addCategory() {
@@ -50,12 +54,18 @@ export default function SkillsAdminPage() {
         title="Compétences"
         resource="skills"
         fields={fields}
-        defaults={{ name: "", category: categories[0] ?? "Front-end", level: 80, devicon: "", order: 0 }}
+        defaults={{
+          category: categories[0] ?? "Front-end",
+          level:    80,
+          devicon:  "",
+          order:    0,
+          name_fr:  "",
+          name_en:  "",
+        }}
       />
 
       {/* ── Gestion des catégories ── */}
       <div className="space-y-3">
-        {/* Ajouter une catégorie */}
         <div
           className="rounded-2xl border p-5"
           style={{ borderColor: "rgba(0,212,255,0.12)", background: "rgba(255,255,255,0.02)" }}
@@ -81,7 +91,6 @@ export default function SkillsAdminPage() {
           </div>
         </div>
 
-        {/* Renommer / Supprimer (CategoryManager) */}
         <CategoryManager resource="skills" endpoint="/api/admin/skills/categories" />
       </div>
     </div>

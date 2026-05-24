@@ -11,14 +11,19 @@ export default function ProjectsAdminPage() {
   const [newCat, setNewCat]         = useState("");
 
   const fields: FieldConfig[] = [
-    { name: "title",       label: "Titre",                        type: "text",      max: 100, required: true },
-    { name: "category",    label: "Catégorie",                    type: "select",    options: categories, required: true },
-    { name: "description", label: "Description",                  type: "textarea",  max: 500, required: true },
-    { name: "imageUrl",    label: "URL de l'image",               type: "image-url" },
-    { name: "tags",        label: "Tags (séparés par virgules)",  type: "tags" },
-    { name: "link",        label: "Lien externe",                 type: "url" },
-    { name: "repo",        label: "Repo Git",                     type: "url" },
-    { name: "order",       label: "Ordre",                        type: "number" },
+    // Champs sans langGroup : toujours visibles
+    { name: "category", label: "Catégorie",                   type: "select",    options: categories, required: true },
+    { name: "imageUrl", label: "URL de l'image",              type: "image-url" },
+    { name: "tags",     label: "Tags (séparés par virgules)", type: "tags" },
+    { name: "link",     label: "Lien externe",                type: "url" },
+    { name: "repo",     label: "Repo Git",                    type: "url" },
+    { name: "order",    label: "Ordre",                       type: "number" },
+    // Onglet FR
+    { name: "title_fr",       label: "Titre (FR)",        type: "text",     max: 100, required: true, langGroup: "fr" },
+    { name: "description_fr", label: "Description (FR)",  type: "textarea", max: 500, required: true, langGroup: "fr" },
+    // Onglet EN
+    { name: "title_en",       label: "Title (EN)",        type: "text",     max: 100, langGroup: "en" },
+    { name: "description_en", label: "Description (EN)",  type: "textarea", max: 500, langGroup: "en" },
   ];
 
   function addCategory() {
@@ -35,21 +40,22 @@ export default function ProjectsAdminPage() {
         resource="projects"
         fields={fields}
         defaults={{
-          title: "",
-          category: categories[0] ?? "Apps",
-          description: "",
-          imageUrl: "",
-          tags: [],
-          link: "",
-          repo: "",
-          gradient: ["#0066cc", "#00d4ff"],
-          order: 0,
+          category:       categories[0] ?? "Apps",
+          imageUrl:       "",
+          tags:           [],
+          link:           "",
+          repo:           "",
+          gradient:       ["#0066cc", "#00d4ff"],
+          order:          0,
+          title_fr:       "",
+          description_fr: "",
+          title_en:       "",
+          description_en: "",
         }}
       />
 
       {/* ── Gestion des catégories ── */}
       <div className="space-y-3">
-        {/* Ajouter une catégorie */}
         <div
           className="rounded-2xl border p-5"
           style={{ borderColor: "rgba(0,212,255,0.12)", background: "rgba(255,255,255,0.02)" }}
@@ -75,7 +81,6 @@ export default function ProjectsAdminPage() {
           </div>
         </div>
 
-        {/* Renommer / Supprimer (CategoryManager) */}
         <CategoryManager resource="projects" endpoint="/api/admin/projects/categories" />
       </div>
     </div>

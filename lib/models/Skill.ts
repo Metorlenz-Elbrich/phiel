@@ -2,11 +2,12 @@ import { Schema, model, models, type InferSchemaType } from "mongoose";
 
 const SkillSchema = new Schema(
   {
-    name: { type: String, required: true, maxlength: 80, trim: true },
-    level: { type: Number, required: true, min: 0, max: 100 },
+    name_fr:  { type: String, required: true, maxlength: 80, trim: true },
+    name_en:  { type: String, default: "",    maxlength: 80, trim: true },
+    level:    { type: Number, required: true, min: 0, max: 100 },
     category: { type: String, required: true, index: true },
-    devicon: { type: String, default: "" },
-    order: { type: Number, default: 0, index: true },
+    devicon:  { type: String, default: "" },
+    order:    { type: Number, default: 0, index: true },
   },
   { timestamps: true }
 );

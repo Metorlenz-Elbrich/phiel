@@ -9,9 +9,9 @@ import { useLang } from "@/lib/language-context";
 const CATEGORY_ORDER: SkillCategory[] = ["Front-end", "Back-end", "Mobile", "Design"];
 const CATEGORY_COLORS: Record<SkillCategory, string> = {
   "Front-end": "#00d4ff",
-  "Back-end": "#5ea8ff",
-  Mobile: "#7ee787",
-  Design: "#ffa657",
+  "Back-end":  "#5ea8ff",
+  Mobile:      "#7ee787",
+  Design:      "#ffa657",
 };
 
 const SKILL_ICONS: Record<string, string> = {
@@ -22,9 +22,9 @@ const SKILL_ICONS: Record<string, string> = {
 };
 
 type SkillTreeNode = {
-  name: string;
-  pct: number;
-  icon: string;
+  name:     string;
+  pct:      number;
+  icon:     string;
   devicon?: string;
   tier: "legendary" | "epic" | "rare";
 };
@@ -37,31 +37,36 @@ function levelToTier(level: number): SkillTreeNode["tier"] {
 
 const FALLBACK_COLORS = ["#e879f9", "#34d399", "#fb923c", "#a3e635"];
 
-function buildTree(skills: CmsSkill[]) {
+function buildTree(skills: CmsSkill[], lang: "fr" | "en") {
   const byCat = new Map<string, CmsSkill[]>();
   for (const s of skills) {
     if (!byCat.has(s.category)) byCat.set(s.category, []);
     byCat.get(s.category)!.push(s);
   }
-  // Connus d'abord, puis catégories dynamiques
-  const known = CATEGORY_ORDER.filter((c) => byCat.has(c));
+  const known   = CATEGORY_ORDER.filter((c) => byCat.has(c));
   const dynamic = Array.from(byCat.keys()).filter((c) => !CATEGORY_ORDER.includes(c as SkillCategory));
   const allCats = [...known, ...dynamic];
 
   return allCats.map((cat, idx) => ({
     category: cat,
     color: CATEGORY_COLORS[cat as SkillCategory] ?? FALLBACK_COLORS[idx % FALLBACK_COLORS.length],
-    nodes: byCat.get(cat)!.map((s) => ({
-      name: s.name,
-      pct: s.level,
-      icon: SKILL_ICONS[s.name] ?? "⭐",
-      devicon: s.devicon || undefined,
-      tier: levelToTier(s.level),
-    })),
+    nodes: byCat.get(cat)!.map((s) => {
+      const name = lang === "en" && s.name_en ? s.name_en : s.name_fr;
+      return {
+        name,
+        pct:     s.level,
+        icon:    SKILL_ICONS[name] ?? SKILL_ICONS[s.name_fr] ?? "⭐",
+        devicon: s.devicon || undefined,
+        tier:    levelToTier(s.level),
+      };
+    }),
   }));
 }
 
-const TIER_STYLES: Record<string, { border: string; bg: string; glow: string; label: string; labelBg: string; labelFg: string }> = {
+const TIER_STYLES: Record<string, {
+  border: string; bg: string; glow: string;
+  label: string; labelBg: string; labelFg: string;
+}> = {
   legendary: {
     border:  "#00d4ff",
     bg:      "rgba(0,212,255,0.12)",
@@ -89,12 +94,12 @@ const TIER_STYLES: Record<string, { border: string; bg: string; glow: string; la
 };
 
 function SkillNode({ node, catColor, visible, delay }: {
-  node: SkillTreeNode;
+  node:     SkillTreeNode;
   catColor: string;
-  visible: boolean;
-  delay: number;
+  visible:  boolean;
+  delay:    number;
 }) {
-  const t = TIER_STYLES[node.tier];
+  const ts = TIER_STYLES[node.tier];
   return (
     <div
       className="flex flex-col items-center"
@@ -104,27 +109,23 @@ function SkillNode({ node, catColor, visible, delay }: {
         transition: `opacity 0.5s ${delay}ms, transform 0.5s ${delay}ms`,
       }}
     >
-      {/* Node box */}
       <div
-        className="relative flex flex-col items-center justify-center rounded-xl cursor-default group"
+        className="relative flex flex-col items-center justify-center rounded-xl cursor-default"
         style={{
-          width: "80px",
-          height: "80px",
-          border: `1.5px solid ${t.border}`,
-          background: t.bg,
-          boxShadow: t.glow,
+          width:      "80px",
+          height:     "80px",
+          border:     `1.5px solid ${ts.border}`,
+          background: ts.bg,
+          boxShadow:  ts.glow,
           transition: "transform 0.2s, box-shadow 0.2s",
         }}
-        onMouseEnter={e => {
+        onMouseEnter={(e) => {
           (e.currentTarget as HTMLDivElement).style.transform = "scale(1.12)";
-          (e.currentTarget as HTMLDivElement).style.boxShadow = t.glow.replace("0.45", "0.8").replace("0.35", "0.6");
         }}
-        onMouseLeave={e => {
+        onMouseLeave={(e) => {
           (e.currentTarget as HTMLDivElement).style.transform = "scale(1)";
-          (e.currentTarget as HTMLDivElement).style.boxShadow = t.glow;
         }}
       >
-        {/* Icon — devicon si dispo, sinon emoji fallback */}
         {node.devicon ? (
           <i
             className={`devicon-${node.devicon}-plain colored`}
@@ -133,33 +134,24 @@ function SkillNode({ node, catColor, visible, delay }: {
         ) : (
           <span style={{ fontSize: "22px", lineHeight: 1 }}>{node.icon}</span>
         )}
-
-        {/* Percentage */}
         <span
           style={{
-            fontSize: "11px",
+            fontSize:   "11px",
             fontWeight: 600,
-            color: t.border,
-            marginTop: "4px",
+            color:      ts.border,
+            marginTop:  "4px",
             fontFamily: "monospace",
           }}
         >
           {node.pct}%
         </span>
-
-        {/* Corner accents */}
         {["top-0 left-0 border-t border-l", "top-0 right-0 border-t border-r",
           "bottom-0 left-0 border-b border-l", "bottom-0 right-0 border-b border-r",
         ].map((cls, i) => (
-          <div
-            key={i}
-            className={`absolute w-2 h-2 ${cls}`}
-            style={{ borderColor: t.border, opacity: 0.7 }}
-          />
+          <div key={i} className={`absolute w-2 h-2 ${cls}`} style={{ borderColor: ts.border, opacity: 0.7 }} />
         ))}
       </div>
 
-      {/* Skill name */}
       <div
         className="mt-2 text-center"
         style={{ fontSize: "10px", color: "rgba(255,255,255,0.6)", maxWidth: "80px" }}
@@ -167,18 +159,17 @@ function SkillNode({ node, catColor, visible, delay }: {
         {node.name}
       </div>
 
-      {/* Tier badge */}
       <div
         className="mt-1 px-2 py-0.5 rounded-full"
         style={{
-          fontSize: "8px",
+          fontSize:      "8px",
           letterSpacing: "0.08em",
-          background: t.labelBg,
-          color: t.labelFg,
-          fontFamily: "monospace",
+          background:    ts.labelBg,
+          color:         ts.labelFg,
+          fontFamily:    "monospace",
         }}
       >
-        {t.label}
+        {ts.label}
       </div>
     </div>
   );
@@ -187,18 +178,16 @@ function SkillNode({ node, catColor, visible, delay }: {
 export default function SkillsSection({ skills }: { skills: CmsSkill[] }) {
   const ref    = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
-  const { t } = useLang();
-  const TREE = buildTree(skills);
+  const { lang, t } = useLang();
+  const TREE = buildTree(skills, lang);
 
-  // Split title : dernier mot/segment en gradient (avant le dernier espace)
   const titleTrimmed = t.skills.title.trim();
-  const lastSpace = titleTrimmed.lastIndexOf(" ");
-  const titlePrefix = lastSpace > 0 ? titleTrimmed.slice(0, lastSpace + 1) : "";
-  const titleAccent = lastSpace > 0 ? titleTrimmed.slice(lastSpace + 1) : titleTrimmed;
+  const lastSpace    = titleTrimmed.lastIndexOf(" ");
+  const titlePrefix  = lastSpace > 0 ? titleTrimmed.slice(0, lastSpace + 1) : "";
+  const titleAccent  = lastSpace > 0 ? titleTrimmed.slice(lastSpace + 1) : titleTrimmed;
 
   return (
     <section id="skills" className="relative py-24 overflow-hidden">
-      {/* Section heading */}
       <div className="container mx-auto px-6 lg:px-16 mb-14">
         <div className="text-center">
           <div className="inline-flex items-center gap-3 mb-4">
@@ -213,8 +202,8 @@ export default function SkillsSection({ skills }: { skills: CmsSkill[] }) {
             <span style={{
               background: "linear-gradient(135deg,#0066cc,#00d4ff)",
               WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
+              WebkitTextFillColor:  "transparent",
+              backgroundClip:       "text",
             }}>
               {titleAccent}
             </span>
@@ -225,18 +214,16 @@ export default function SkillsSection({ skills }: { skills: CmsSkill[] }) {
         </div>
       </div>
 
-      {/* Skill tree board */}
       <div className="container mx-auto px-6 lg:px-16">
         <div
           ref={ref}
           className="relative rounded-2xl overflow-hidden"
           style={{
             background: "#07101f",
-            border: "1px solid rgba(0,212,255,0.15)",
-            boxShadow: "0 0 60px rgba(0,102,204,0.15)",
+            border:     "1px solid rgba(0,212,255,0.15)",
+            boxShadow:  "0 0 60px rgba(0,102,204,0.15)",
           }}
         >
-          {/* Grid bg */}
           <div
             className="absolute inset-0"
             aria-hidden="true"
@@ -248,7 +235,6 @@ export default function SkillsSection({ skills }: { skills: CmsSkill[] }) {
             }}
           />
 
-          {/* Top bar — game HUD style */}
           <div
             className="relative flex items-center justify-between px-6 py-3 border-b"
             style={{ borderColor: "rgba(0,212,255,0.12)", background: "rgba(0,0,0,0.3)" }}
@@ -264,39 +250,35 @@ export default function SkillsSection({ skills }: { skills: CmsSkill[] }) {
                 { label: "LÉGENDAIRE", color: "#00d4ff" },
                 { label: "ÉPIQUE",     color: "#a78bfa" },
                 { label: "RARE",       color: "#60a5fa" },
-              ].map(t => (
-                <div key={t.label} className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full" style={{ background: t.color }} />
+              ].map((tier) => (
+                <div key={tier.label} className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full" style={{ background: tier.color }} />
                   <span style={{ fontSize: "9px", fontFamily: "monospace", color: "rgba(255,255,255,0.4)", letterSpacing: "0.06em" }}>
-                    {t.label}
+                    {tier.label}
                   </span>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Tree content */}
           <div className="relative p-8">
             <div className="flex gap-6 justify-center flex-wrap lg:flex-nowrap">
               {TREE.map((cat, ci) => (
                 <div key={cat.category} className="flex flex-col items-center min-w-[96px]">
-
-                  {/* Category header */}
                   <div
                     className="mb-6 px-3 py-1 rounded-full text-center"
                     style={{
-                      fontSize: "9px",
+                      fontSize:      "9px",
                       letterSpacing: "0.12em",
-                      fontFamily: "monospace",
-                      color: cat.color,
-                      border: `1px solid ${cat.color}40`,
-                      background: `${cat.color}12`,
+                      fontFamily:    "monospace",
+                      color:         cat.color,
+                      border:        `1px solid ${cat.color}40`,
+                      background:    `${cat.color}12`,
                     }}
                   >
                     {cat.category.toUpperCase()}
                   </div>
 
-                  {/* Nodes with vertical connectors */}
                   {cat.nodes.map((node, ni) => (
                     <div key={node.name} className="flex flex-col items-center">
                       <SkillNode
@@ -305,15 +287,14 @@ export default function SkillsSection({ skills }: { skills: CmsSkill[] }) {
                         visible={inView}
                         delay={ci * 80 + ni * 100}
                       />
-                      {/* Connector */}
                       {ni < cat.nodes.length - 1 && (
                         <div
                           style={{
-                            width: "2px",
-                            height: "20px",
+                            width:      "2px",
+                            height:     "20px",
                             background: `linear-gradient(to bottom, ${cat.color}60, ${cat.color}20)`,
-                            margin: "4px 0",
-                            opacity: inView ? 1 : 0,
+                            margin:     "4px 0",
+                            opacity:    inView ? 1 : 0,
                             transition: `opacity 0.5s ${ci * 80 + ni * 100 + 200}ms`,
                           }}
                         />
@@ -324,7 +305,6 @@ export default function SkillsSection({ skills }: { skills: CmsSkill[] }) {
               ))}
             </div>
 
-            {/* Bottom XP bar */}
             <div className="mt-8 pt-6" style={{ borderTop: "1px solid rgba(0,212,255,0.08)" }}>
               <div className="flex items-center justify-between mb-2">
                 <span style={{ fontSize: "9px", fontFamily: "monospace", color: "rgba(0,212,255,0.5)", letterSpacing: "0.1em" }}>
@@ -337,12 +317,12 @@ export default function SkillsSection({ skills }: { skills: CmsSkill[] }) {
               <div className="rounded-full overflow-hidden" style={{ height: "6px", background: "rgba(255,255,255,0.06)" }}>
                 <div
                   style={{
-                    height: "100%",
-                    width: inView ? "86%" : "0%",
-                    background: "linear-gradient(90deg,#0066cc,#00d4ff)",
+                    height:       "100%",
+                    width:        inView ? "86%" : "0%",
+                    background:   "linear-gradient(90deg,#0066cc,#00d4ff)",
                     borderRadius: "9999px",
-                    transition: "width 1.5s 0.8s cubic-bezier(.4,0,.2,1)",
-                    boxShadow: "0 0 8px rgba(0,212,255,0.5)",
+                    transition:   "width 1.5s 0.8s cubic-bezier(.4,0,.2,1)",
+                    boxShadow:    "0 0 8px rgba(0,212,255,0.5)",
                   }}
                 />
               </div>

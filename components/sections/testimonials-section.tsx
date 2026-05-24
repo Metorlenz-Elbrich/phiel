@@ -13,19 +13,23 @@ export function TestimonialsSection({
 }: {
   testimonials: CmsTestimonial[];
 }) {
-  const { t } = useLang();
-  const TESTIMONIALS = testimonials;
+  const { lang, t } = useLang();
   const [idx, setIdx] = useState(0);
 
   useEffect(() => {
-    if (TESTIMONIALS.length === 0) return;
+    if (testimonials.length === 0) return;
     const id = setInterval(() => {
-      setIdx((i) => (i + 1) % TESTIMONIALS.length);
+      setIdx((i) => (i + 1) % testimonials.length);
     }, 7000);
     return () => clearInterval(id);
-  }, [TESTIMONIALS.length]);
+  }, [testimonials.length]);
 
-  if (TESTIMONIALS.length === 0) return null;
+  if (testimonials.length === 0) return null;
+
+  const current  = testimonials[idx];
+  const name     = lang === "en" && current.name_en  ? current.name_en  : current.name_fr;
+  const role     = lang === "en" && current.role_en  ? current.role_en  : current.role_fr;
+  const quote    = lang === "en" && current.quote_en ? current.quote_en : current.quote_fr;
 
   return (
     <section
@@ -67,15 +71,15 @@ export function TestimonialsSection({
                 transition={{ duration: 0.45, ease: "easeOut" }}
               >
                 <blockquote className="text-lg sm:text-xl font-medium leading-relaxed text-foreground/90">
-                  « {TESTIMONIALS[idx].quote} »
+                  « {quote} »
                 </blockquote>
                 <figcaption className="mt-6 flex items-center gap-3">
                   <div className="grid h-10 w-10 place-items-center rounded-full bg-phi-gradient text-white text-sm font-semibold">
-                    {TESTIMONIALS[idx].name.slice(0, 1)}
+                    {name.slice(0, 1)}
                   </div>
                   <div>
-                    <p className="text-sm font-semibold">{TESTIMONIALS[idx].name}</p>
-                    <p className="text-xs text-foreground/60">{TESTIMONIALS[idx].role}</p>
+                    <p className="text-sm font-semibold">{name}</p>
+                    <p className="text-xs text-foreground/60">{role}</p>
                   </div>
                 </figcaption>
               </motion.figure>
@@ -83,12 +87,12 @@ export function TestimonialsSection({
           </div>
 
           <div className="mt-6 flex items-center justify-center gap-2">
-            {TESTIMONIALS.map((_, i) => (
+            {testimonials.map((_, i) => (
               <button
                 key={i}
                 type="button"
                 onClick={() => setIdx(i)}
-                aria-label={`Témoignage ${i + 1}`}
+                aria-label={`${lang === "en" ? "Testimonial" : "Témoignage"} ${i + 1}`}
                 className={cn(
                   "h-2 rounded-full transition-all",
                   i === idx ? "w-8 bg-phi-gradient" : "w-2 bg-[color:var(--border-strong)] hover:bg-phi-cyan/60"

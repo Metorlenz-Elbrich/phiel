@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { EntityTable, type FieldConfig, type IconOption } from "../_components/entity-table";
 
-// IconName valides (tirés de components/ui/icon.tsx)
 const VALID_ICON_VALUES = [
   "palette", "code", "smartphone", "sparkle", "mail",
   "phone", "mapPin", "arrowRight", "external", "check",
@@ -26,11 +25,17 @@ export default function ServicesAdminPage() {
   const [editIcon, setEditIcon] = useState<IconOption>({ value: "", label: "", emoji: "" });
 
   const fields: FieldConfig[] = [
-    { name: "title",       label: "Titre",                                    type: "text",        max: 100, required: true },
-    { name: "icon",        label: "Icône",                                    type: "icon-picker", iconOptions: icons, required: true },
-    { name: "description", label: "Description",                              type: "textarea",    max: 500, required: true },
-    { name: "features",    label: "Caractéristiques (séparées par virgules)", type: "tags" },
-    { name: "order",       label: "Ordre",                                    type: "number" },
+    // Champs sans langGroup : toujours visibles
+    { name: "icon",         label: "Icône",                                          type: "icon-picker", iconOptions: icons, required: true },
+    { name: "order",        label: "Ordre",                                          type: "number" },
+    // Onglet FR
+    { name: "title_fr",       label: "Titre (FR)",                                  type: "text",     max: 100, required: true,  langGroup: "fr" },
+    { name: "description_fr", label: "Description (FR)",                            type: "textarea", max: 500, required: true,  langGroup: "fr" },
+    { name: "features_fr",    label: "Caractéristiques FR (séparées par virgules)", type: "tags",                               langGroup: "fr" },
+    // Onglet EN
+    { name: "title_en",       label: "Title (EN)",                                  type: "text",     max: 100,                langGroup: "en" },
+    { name: "description_en", label: "Description (EN)",                            type: "textarea", max: 500,                langGroup: "en" },
+    { name: "features_en",    label: "Features EN (comma-separated)",               type: "tags",                              langGroup: "en" },
   ];
 
   function addIcon() {
@@ -57,7 +62,16 @@ export default function ServicesAdminPage() {
         title="Services"
         resource="services"
         fields={fields}
-        defaults={{ icon: icons[0]?.value ?? "palette", title: "", description: "", features: [], order: 0 }}
+        defaults={{
+          icon:           icons[0]?.value ?? "palette",
+          order:          0,
+          title_fr:       "",
+          description_fr: "",
+          features_fr:    [],
+          title_en:       "",
+          description_en: "",
+          features_en:    [],
+        }}
       />
 
       {/* ── Gestion des icônes ── */}
@@ -67,7 +81,6 @@ export default function ServicesAdminPage() {
       >
         <h2 className="text-lg font-semibold mb-4">Gestion des icônes</h2>
 
-        {/* Tableau des icônes existantes */}
         <div className="rounded-xl border overflow-hidden mb-6" style={{ borderColor: "rgba(0,212,255,0.12)" }}>
           <table className="w-full text-sm">
             <thead style={{ background: "rgba(0,212,255,0.08)" }}>
@@ -168,7 +181,6 @@ export default function ServicesAdminPage() {
           </table>
         </div>
 
-        {/* Formulaire d'ajout */}
         <div className="flex flex-wrap items-end gap-3">
           <label className="block">
             <span className="mb-1 block text-xs font-medium uppercase tracking-wider text-white/70">Emoji</span>

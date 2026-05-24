@@ -34,14 +34,11 @@ function Counter({ target, suffix, active }: { target: number; suffix: string; a
 
   useEffect(() => {
     if (!active) return;
-    let start = 0;
-    const duration = 1800;
+    const duration  = 1800;
     const startTime = performance.now();
     const tick = (now: number) => {
-      const elapsed = now - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      // cubic ease-out
-      const eased = 1 - Math.pow(1 - progress, 3);
+      const progress = Math.min((now - startTime) / duration, 1);
+      const eased    = 1 - Math.pow(1 - progress, 3);
       setCount(Math.floor(eased * target));
       if (progress < 1) requestAnimationFrame(tick);
       else setCount(target);
@@ -53,19 +50,18 @@ function Counter({ target, suffix, active }: { target: number; suffix: string; a
 }
 
 export default function StatsSection({ stats }: { stats: CmsStat[] }) {
-  const ref  = useRef<HTMLDivElement>(null);
+  const ref    = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
-  const { t } = useLang();
-  const STATS = stats.map((s, i) => ({
+  const { lang, t } = useLang();
+
+  const STATS = stats.map((s) => ({
     ...s,
-    icon: STAT_ICONS[s.icon] ?? STAT_ICONS.sparkle,
-    label: t.stats.items[i] ?? s.label,
+    icon:  STAT_ICONS[s.icon] ?? STAT_ICONS.sparkle,
+    label: lang === "en" && s.label_en ? s.label_en : s.label_fr,
   }));
 
   return (
     <section id="stats" className="relative py-24 overflow-hidden">
-
-      {/* Background accent */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0"
@@ -75,8 +71,6 @@ export default function StatsSection({ stats }: { stats: CmsStat[] }) {
       />
 
       <div className="container mx-auto px-6 lg:px-16">
-
-        {/* Section heading */}
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-3 mb-4">
             <span className="block h-px w-8" style={{ background: "linear-gradient(90deg,transparent,#00d4ff)" }} />
@@ -90,8 +84,8 @@ export default function StatsSection({ stats }: { stats: CmsStat[] }) {
             <span style={{
               background: "linear-gradient(135deg,#0066cc,#00d4ff)",
               WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
+              WebkitTextFillColor:  "transparent",
+              backgroundClip:       "text",
             }}>
               {t.stats.title2}
             </span>
@@ -101,37 +95,33 @@ export default function StatsSection({ stats }: { stats: CmsStat[] }) {
           </p>
         </div>
 
-        {/* Stats grid */}
         <div ref={ref} className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           {STATS.map((s, i) => (
             <div
-              key={s.label}
+              key={s.label_fr}
               className="relative flex flex-col items-center text-center p-8 rounded-2xl transition-all duration-300 hover:-translate-y-1"
               style={{
-                background: "var(--surface)",
-                border: "1px solid var(--border)",
+                background:      "var(--surface)",
+                border:          "1px solid var(--border)",
                 transitionDelay: `${i * 80}ms`,
               }}
             >
-              {/* Top accent bar */}
               <div
                 className="absolute top-0 left-6 right-6 h-px rounded-full"
                 style={{ background: `linear-gradient(90deg,transparent,${s.color},transparent)` }}
               />
 
-              {/* Icon */}
               <div
                 className="flex items-center justify-center w-14 h-14 rounded-xl mb-5"
                 style={{
                   background: `linear-gradient(135deg,${s.color}18,${s.color}08)`,
-                  border: `1px solid ${s.color}30`,
-                  color: s.color,
+                  border:     `1px solid ${s.color}30`,
+                  color:      s.color,
                 }}
               >
                 {s.icon}
               </div>
 
-              {/* Counter */}
               <div
                 className="font-display text-5xl font-black mb-2 tabular-nums"
                 style={{ color: s.color, lineHeight: 1 }}
@@ -139,15 +129,10 @@ export default function StatsSection({ stats }: { stats: CmsStat[] }) {
                 <Counter target={s.value} suffix={s.suffix} active={inView} />
               </div>
 
-              {/* Label */}
-              <div
-                className="text-sm font-medium"
-                style={{ color: "var(--foreground)", opacity: 0.6 }}
-              >
+              <div className="text-sm font-medium" style={{ color: "var(--foreground)", opacity: 0.6 }}>
                 {s.label}
               </div>
 
-              {/* Bottom glow */}
               <div
                 aria-hidden="true"
                 className="absolute bottom-0 left-1/2 -translate-x-1/2 w-16 h-px"
@@ -156,7 +141,6 @@ export default function StatsSection({ stats }: { stats: CmsStat[] }) {
             </div>
           ))}
         </div>
-
       </div>
     </section>
   );

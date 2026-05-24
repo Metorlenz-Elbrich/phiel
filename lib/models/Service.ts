@@ -2,11 +2,14 @@ import { Schema, model, models, type InferSchemaType } from "mongoose";
 
 const ServiceSchema = new Schema(
   {
-    icon: { type: String, required: true },
-    title: { type: String, required: true, maxlength: 100, trim: true },
-    description: { type: String, required: true, maxlength: 500, trim: true },
-    features: { type: [String], default: [], validate: (v: string[]) => v.length <= 10 },
-    order: { type: Number, default: 0, index: true },
+    icon:           { type: String, required: true },
+    title_fr:       { type: String, required: true, maxlength: 100, trim: true },
+    title_en:       { type: String, default: "",    maxlength: 100, trim: true },
+    description_fr: { type: String, required: true, maxlength: 500, trim: true },
+    description_en: { type: String, default: "",    maxlength: 500, trim: true },
+    features_fr:    { type: [String], default: [], validate: (v: string[]) => v.length <= 10 },
+    features_en:    { type: [String], default: [] },
+    order:          { type: Number, default: 0, index: true },
   },
   { timestamps: true }
 );

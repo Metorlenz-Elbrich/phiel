@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 import { useLang } from "@/lib/language-context";
 
 export function PortfolioSection({ projects: allProjects }: { projects: CmsProject[] }) {
-  const { t } = useLang();
+  const { lang, t } = useLang();
   const [filter, setFilter] = useState<PortfolioCategory>("Tous");
   const projects = useMemo(
     () => (filter === "Tous" ? allProjects : allProjects.filter((p) => p.category === filter)),
@@ -59,91 +59,93 @@ export function PortfolioSection({ projects: allProjects }: { projects: CmsProje
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <AnimatePresence mode="popLayout">
-            {projects.map((p, i) => (
-              <motion.div
-                key={p.id}
-                layout
-                initial={{ opacity: 0, y: 18, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.98 }}
-                transition={{ duration: 0.35, delay: (i % 6) * 0.04 }}
-              >
-                <Card interactive className="h-full flex flex-col">
-                  <div
-                    className="mb-5 aspect-[16/10] w-full rounded-xl border border-white/10 grid place-items-center text-white relative overflow-hidden"
-                    style={{
-                      background: p.imageUrl ? "#07101f" : `linear-gradient(135deg, ${p.gradient[0]}, ${p.gradient[1]})`,
-                    }}
-                  >
-                    {p.imageUrl ? (
-                      <img
-                        src={p.imageUrl}
-                        alt={p.title}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <>
-                        <span
-                          aria-hidden
-                          className="absolute inset-0 opacity-30 mix-blend-overlay"
-                          style={{
-                            backgroundImage:
-                              "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.5), transparent 40%), radial-gradient(circle at 80% 70%, rgba(0,0,0,0.4), transparent 50%)",
-                          }}
+            {projects.map((p, i) => {
+              const title       = lang === "en" && p.title_en       ? p.title_en       : p.title_fr;
+              const description = lang === "en" && p.description_en ? p.description_en : p.description_fr;
+              return (
+                <motion.div
+                  key={p.id}
+                  layout
+                  initial={{ opacity: 0, y: 18, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  transition={{ duration: 0.35, delay: (i % 6) * 0.04 }}
+                >
+                  <Card interactive className="h-full flex flex-col">
+                    <div
+                      className="mb-5 aspect-[16/10] w-full rounded-xl border border-white/10 grid place-items-center text-white relative overflow-hidden"
+                      style={{
+                        background: p.imageUrl ? "#07101f" : `linear-gradient(135deg, ${p.gradient[0]}, ${p.gradient[1]})`,
+                      }}
+                    >
+                      {p.imageUrl ? (
+                        <img
+                          src={p.imageUrl}
+                          alt={title}
+                          className="h-full w-full object-cover"
                         />
-                        <span className="relative text-5xl font-display font-semibold drop-shadow-lg">
-                          {p.title.slice(0, 2)}
-                        </span>
-                      </>
-                    )}
-                  </div>
-                  <div className="flex items-center justify-between gap-2">
-                    <h3 className="text-lg font-semibold tracking-tight">{p.title}</h3>
-                    <span className="rounded-full border border-[color:var(--border)] px-2.5 py-0.5 text-xs text-foreground/70">
-                      {p.category}
-                    </span>
-                  </div>
-                  <p className="mt-2 text-sm text-foreground/70 line-clamp-3 flex-1">
-                    {p.description}
-                  </p>
-                  <ul className="mt-4 flex flex-wrap gap-1.5">
-                    {p.tags.map((t) => (
-                      <li
-                        key={t}
-                        className="rounded-full bg-[color:var(--surface-muted)] px-2.5 py-0.5 text-xs text-foreground/70"
-                      >
-                        {t}
-                      </li>
-                    ))}
-                  </ul>
-                  {(p.link || p.repo) && (
-                    <div className="mt-5 flex items-center gap-3 text-sm">
-                      {p.link && (
-                        <a
-                          href={p.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-phi-cyan hover:underline"
-                        >
-                          Voir le projet <Icon name="external" size={14} />
-                        </a>
-                      )}
-                      {p.repo && (
-                        <a
-                          href={p.repo}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-foreground/70 hover:text-phi-cyan"
-                          aria-label={`Voir ${p.title} sur GitHub`}
-                        >
-                          <Icon name="github" size={16} /> GitHub
-                        </a>
+                      ) : (
+                        <>
+                          <span
+                            aria-hidden
+                            className="absolute inset-0 opacity-30 mix-blend-overlay"
+                            style={{
+                              backgroundImage:
+                                "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.5), transparent 40%), radial-gradient(circle at 80% 70%, rgba(0,0,0,0.4), transparent 50%)",
+                            }}
+                          />
+                          <span className="relative text-5xl font-display font-semibold drop-shadow-lg">
+                            {p.title_fr.slice(0, 2)}
+                          </span>
+                        </>
                       )}
                     </div>
-                  )}
-                </Card>
-              </motion.div>
-            ))}
+                    <div className="flex items-center justify-between gap-2">
+                      <h3 className="text-lg font-semibold tracking-tight">{title}</h3>
+                      <span className="rounded-full border border-[color:var(--border)] px-2.5 py-0.5 text-xs text-foreground/70">
+                        {p.category}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-sm text-foreground/70 line-clamp-3 flex-1">{description}</p>
+                    <ul className="mt-4 flex flex-wrap gap-1.5">
+                      {p.tags.map((tag) => (
+                        <li
+                          key={tag}
+                          className="rounded-full bg-[color:var(--surface-muted)] px-2.5 py-0.5 text-xs text-foreground/70"
+                        >
+                          {tag}
+                        </li>
+                      ))}
+                    </ul>
+                    {(p.link || p.repo) && (
+                      <div className="mt-5 flex items-center gap-3 text-sm">
+                        {p.link && (
+                          <a
+                            href={p.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 text-phi-cyan hover:underline"
+                          >
+                            {lang === "en" ? "View project" : "Voir le projet"} <Icon name="external" size={14} />
+                          </a>
+                        )}
+                        {p.repo && (
+                          <a
+                            href={p.repo}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 text-foreground/70 hover:text-phi-cyan"
+                            aria-label={`${lang === "en" ? "View" : "Voir"} ${title} ${lang === "en" ? "on GitHub" : "sur GitHub"}`}
+                          >
+                            <Icon name="github" size={16} /> GitHub
+                          </a>
+                        )}
+                      </div>
+                    )}
+                  </Card>
+                </motion.div>
+              );
+            })}
           </AnimatePresence>
         </div>
       </div>
