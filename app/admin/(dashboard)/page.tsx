@@ -6,6 +6,7 @@ import { Project } from "@/lib/models/Project";
 import { TeamMember } from "@/lib/models/TeamMember";
 import { Testimonial } from "@/lib/models/Testimonial";
 import { SeedButton } from "./_components/seed-button";
+import { MigrateButton } from "./_components/migrate-button";
 
 export const dynamic = "force-dynamic";
 
@@ -85,8 +86,9 @@ export default async function AdminHomePage() {
           Importer le contenu actuel de <code>lib/data.ts</code> dans MongoDB
           (idempotent — n&apos;écrase pas les collections déjà peuplées).
         </p>
-        <div className="mt-4">
+        <div className="mt-4 flex flex-wrap gap-3">
           <SeedButton />
+          <MigrateButton />
         </div>
       </section>
     </div>
