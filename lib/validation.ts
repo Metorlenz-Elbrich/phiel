@@ -18,8 +18,8 @@ const safeString = (max: number) =>
       message: "Caractères de contrôle interdits",
     });
 
-/** Champ texte optionnel (traduction EN peut être vide) */
-const optText = (max: number) => z.string().trim().max(max).default("");
+/** Champ texte optionnel (traduction EN peut être vide ou absente) */
+const optText = (max: number) => z.string().trim().max(max).optional().default("");
 
 const urlField  = z.string().url().max(2048);
 const hexColor  = z.string().regex(/^#[0-9a-fA-F]{6}$/);
@@ -35,8 +35,8 @@ export const ServiceSchema = z.object({
   title_en:       optText(100),
   description_fr: safeString(500),
   description_en: optText(500),
-  features_fr:    z.array(safeString(80)).max(10).default([]),
-  features_en:    z.array(z.string().trim().max(80)).max(10).default([]),
+  features_fr:    z.array(safeString(80)).max(10).optional().default([]),
+  features_en:    z.array(z.string().trim().max(80)).max(10).optional().default([]),
   order:          z.number().int().min(0).default(0),
 });
 export type ServiceInput = z.infer<typeof ServiceSchema>;
@@ -68,7 +68,7 @@ export const ProjectSchema = z.object({
   category:       z.string().trim().min(1).max(60),
   description_fr: safeString(500),
   description_en: optText(500),
-  tags:     z.array(safeString(40)).max(8).default([]),
+  tags:     z.array(safeString(40)).max(8).optional().default([]),
   link:     urlField.optional().or(z.literal("").transform(() => undefined)),
   repo:     urlField.optional().or(z.literal("").transform(() => undefined)),
   imageUrl: z.string().max(2048).default(""),
