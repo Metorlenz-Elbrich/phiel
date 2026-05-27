@@ -107,4 +107,12 @@ export const LoginSchema = z.object({
 });
 export type LoginInput = z.infer<typeof LoginSchema>;
 
+export const SlideSchema = z.object({
+  phrase_fr: safeString(300),
+  phrase_en: safeString(300),
+  imageUrl:  z.string().trim().min(1).max(2048),
+  order:     z.number().int().min(0).default(0),
+});
+export type SlideInput = z.infer<typeof SlideSchema>;
+
 export const ObjectIdSchema = z.string().regex(/^[a-f0-9]{24}$/i, "ID invalide");

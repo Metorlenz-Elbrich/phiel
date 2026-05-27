@@ -14,6 +14,7 @@ import { Stat } from "@/lib/models/Stat";
 import { Project } from "@/lib/models/Project";
 import { TeamMember } from "@/lib/models/TeamMember";
 import { Testimonial } from "@/lib/models/Testimonial";
+import { Slide } from "@/lib/models/Slide";
 
 // ─── Données bilingues complètes ─────────────────────────────────────────────
 
@@ -136,6 +137,15 @@ const TEAM_DATA = [
   },
 ];
 
+const SLIDES_DATA = [
+  { phrase_fr: "On transforme vos idées en code.",        phrase_en: "We turn your ideas into code.",              imageUrl: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1600&q=80", order: 0 },
+  { phrase_fr: "Du premier croquis au déploiement.",      phrase_en: "From first sketch to deployment.",           imageUrl: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1600&q=80", order: 1 },
+  { phrase_fr: "Une marque qui se reconnaît partout.",    phrase_en: "A brand that stands out everywhere.",        imageUrl: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1600&q=80", order: 2 },
+  { phrase_fr: "Chaque pixel a une raison d'être.",       phrase_en: "Every pixel has a purpose.",                imageUrl: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1600&q=80", order: 3 },
+  { phrase_fr: "Le futur, on le construit maintenant.",   phrase_en: "The future, we build it now.",              imageUrl: "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=1600&q=80", order: 4 },
+  { phrase_fr: "L'ingénierie au service de l'ambition.", phrase_en: "Engineering at the service of ambition.",   imageUrl: "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=1600&q=80", order: 5 },
+];
+
 const TESTIMONIALS_DATA = [
   {
     name_fr: "Client #1", name_en: "Client #1",
@@ -192,6 +202,10 @@ export async function POST() {
 
     if ((await Testimonial.countDocuments()) === 0) {
       results.testimonials = (await Testimonial.insertMany(TESTIMONIALS_DATA)).length;
+    }
+
+    if ((await Slide.countDocuments()) === 0) {
+      results.slides = (await Slide.insertMany(SLIDES_DATA)).length;
     }
 
     securityLog.adminAction({

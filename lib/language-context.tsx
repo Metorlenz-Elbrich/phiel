@@ -22,10 +22,19 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
+      // 1. Priorité : préférence explicitement sauvegardée par l'utilisateur
       const saved = window.localStorage.getItem("phibrain-lang");
-      if (saved === "fr" || saved === "en") setLangState(saved);
+      if (saved === "fr" || saved === "en") {
+        setLangState(saved);
+        return;
+      }
+
+      // 2. Sinon : langue du navigateur/appareil
+      const browserLang = (navigator.language ?? navigator.languages?.[0] ?? "fr").toLowerCase();
+      setLangState(browserLang.startsWith("fr") ? "fr" : "en");
+
     } catch {
-      /* localStorage indisponible */
+      /* localStorage indisponible (mode privé strict, etc.) */
     }
   }, []);
 
