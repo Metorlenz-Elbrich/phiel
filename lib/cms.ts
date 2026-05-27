@@ -109,7 +109,7 @@ export const getServices = unstable_cache(
   async (): Promise<CmsService[]> =>
     safeFetch(async () => {
       const docs = await Service.find({}).sort({ order: 1 }).lean();
-      if (docs.length === 0) throw new Error("empty");
+
       return docs.map((d) => ({
         id:             String(d._id),
         icon:           s(d.icon) as ServiceIcon,
@@ -138,7 +138,7 @@ export const getSkills = unstable_cache(
   async (): Promise<CmsSkill[]> =>
     safeFetch(async () => {
       const docs = await Skill.find({}).sort({ category: 1, order: 1 }).lean();
-      if (docs.length === 0) throw new Error("empty");
+
       return docs.map((d) => ({
         name_fr:  s(d.name_fr),
         name_en:  s(d.name_en),
@@ -164,7 +164,7 @@ export const getStats = unstable_cache(
     safeFetch(
       async () => {
         const docs = await Stat.find({}).sort({ order: 1 }).lean();
-        if (docs.length === 0) throw new Error("empty");
+  
         return docs.map((d) => ({
           label_fr: s(d.label_fr),
           label_en: s(d.label_en),
@@ -191,7 +191,7 @@ export const getProjects = unstable_cache(
   async (): Promise<CmsProject[]> =>
     safeFetch(async () => {
       const docs = await Project.find({}).sort({ order: 1 }).lean();
-      if (docs.length === 0) throw new Error("empty");
+
       return docs.map((d) => ({
         id:             String(d._id),
         title_fr:       s(d.title_fr),
@@ -229,7 +229,7 @@ export const getTeam = unstable_cache(
   async (): Promise<CmsTeamMember[]> =>
     safeFetch(async () => {
       const docs = await TeamMember.find({}).sort({ order: 1 }).lean();
-      if (docs.length === 0) throw new Error("empty");
+
       return docs.map((d) => ({
         name_fr:  s(d.name_fr),
         name_en:  s(d.name_en),
@@ -256,7 +256,7 @@ export const getTestimonials = unstable_cache(
   async (): Promise<CmsTestimonial[]> =>
     safeFetch(async () => {
       const docs = await Testimonial.find({}).sort({ order: 1 }).lean();
-      if (docs.length === 0) throw new Error("empty");
+
       return docs.map((d) => ({
         name_fr:  s(d.name_fr),
         name_en:  s(d.name_en),

@@ -7,6 +7,7 @@
  */
 
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import type { Model } from "mongoose";
 import type { ZodTypeAny, z } from "zod";
 import { connectDB } from "@/lib/mongodb";
@@ -134,6 +135,7 @@ export function createItemHandlers<S extends ZodTypeAny>(
         resource,
         resourceId: id,
       });
+      revalidateTag(`cms:${resource}`, "max");
       return NextResponse.json({ ok: true });
     } catch (err) {
       return apiError(err, { context: `DELETE /api/admin/${resource}/[id]` });
