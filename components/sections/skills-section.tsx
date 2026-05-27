@@ -93,7 +93,7 @@ const TIER_STYLES: Record<string, {
   },
 };
 
-function SkillNode({ node, catColor, visible, delay }: {
+function SkillNode({ node, visible, delay }: {
   node:     SkillTreeNode;
   catColor: string;
   visible:  boolean;
@@ -129,22 +129,13 @@ function SkillNode({ node, catColor, visible, delay }: {
         {node.devicon ? (
           <i
             className={`devicon-${node.devicon}-plain colored`}
-            style={{ fontSize: "22px", lineHeight: 1 }}
+            style={{ fontSize: "32px", lineHeight: 1 }}
           />
         ) : (
-          <span style={{ fontSize: "22px", lineHeight: 1 }}>{node.icon}</span>
+          <span style={{ fontSize: "32px", lineHeight: 1 }}>{node.icon}</span>
         )}
-        <span
-          style={{
-            fontSize:   "11px",
-            fontWeight: 600,
-            color:      ts.border,
-            marginTop:  "4px",
-            fontFamily: "monospace",
-          }}
-        >
-          {node.pct}%
-        </span>
+
+        {/* Coins décoratifs */}
         {["top-0 left-0 border-t border-l", "top-0 right-0 border-t border-r",
           "bottom-0 left-0 border-b border-l", "bottom-0 right-0 border-b border-r",
         ].map((cls, i) => (
@@ -152,6 +143,7 @@ function SkillNode({ node, catColor, visible, delay }: {
         ))}
       </div>
 
+      {/* Nom */}
       <div
         className="mt-2 text-center"
         style={{ fontSize: "10px", color: "rgba(255,255,255,0.6)", maxWidth: "80px" }}
@@ -159,6 +151,7 @@ function SkillNode({ node, catColor, visible, delay }: {
         {node.name}
       </div>
 
+      {/* Badge tier */}
       <div
         className="mt-1 px-2 py-0.5 rounded-full"
         style={{
@@ -235,6 +228,7 @@ export default function SkillsSection({ skills }: { skills: CmsSkill[] }) {
             }}
           />
 
+          {/* HUD header */}
           <div
             className="relative flex items-center justify-between px-6 py-3 border-b"
             style={{ borderColor: "rgba(0,212,255,0.12)", background: "rgba(0,0,0,0.3)" }}
@@ -305,6 +299,7 @@ export default function SkillsSection({ skills }: { skills: CmsSkill[] }) {
               ))}
             </div>
 
+            {/* XP bar */}
             <div className="mt-8 pt-6" style={{ borderTop: "1px solid rgba(0,212,255,0.08)" }}>
               <div className="flex items-center justify-between mb-2">
                 <span style={{ fontSize: "9px", fontFamily: "monospace", color: "rgba(0,212,255,0.5)", letterSpacing: "0.1em" }}>
