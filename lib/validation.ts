@@ -5,8 +5,8 @@
 
 import { z } from "zod";
 
-// eslint-disable-next-line no-control-regex
-const ctrlChars = /[ -]/;
+// Uniquement les vrais caractères de contrôle (0x00–0x1F), PAS les espaces
+const ctrlChars = /[\x00-\x1F]/;
 
 const safeString = (max: number) =>
   z
@@ -26,16 +26,17 @@ const hexColor  = z.string().regex(/^#[0-9a-fA-F]{6}$/);
 
 const SERVICE_ICONS = [
   "palette", "code", "smartphone", "sparkle", "server", "mail",
+  "phone", "mapPin", "arrowRight", "external", "check",
   "branding", "web", "mobile", // legacy
 ] as const;
 
 export const ServiceSchema = z.object({
-  icon:           z.enum(SERVICE_ICONS),
+  icon:           z.string().trim().min(1).max(40),
   title_fr:       safeString(100),
   title_en:       optText(100),
   description_fr: safeString(500),
   description_en: optText(500),
-  features_fr:    z.array(safeString(80)).max(10).optional().default([]),
+  features_fr:    z.array(z.string().trim().max(80)).max(10).optional().default([]),
   features_en:    z.array(z.string().trim().max(80)).max(10).optional().default([]),
   order:          z.number().int().min(0).default(0),
 });
@@ -68,7 +69,7 @@ export const ProjectSchema = z.object({
   category:       z.string().trim().min(1).max(60),
   description_fr: safeString(500),
   description_en: optText(500),
-  tags:     z.array(safeString(40)).max(8).optional().default([]),
+  tags:     z.array(z.string().trim().max(40)).max(8).optional().default([]),
   link:     urlField.optional().or(z.literal("").transform(() => undefined)),
   repo:     urlField.optional().or(z.literal("").transform(() => undefined)),
   imageUrl: z.string().max(2048).default(""),
