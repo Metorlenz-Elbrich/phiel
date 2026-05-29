@@ -69,7 +69,7 @@ export function EntityTable({
 
   return (
     <div className="space-y-6">
-      <header className="flex items-center justify-between">
+      <header className="flex items-center justify-between flex-wrap gap-3">
         <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
         <button
           type="button"
@@ -111,54 +111,98 @@ export function EntityTable({
       {loading ? (
         <p className="text-sm text-white/50">Chargement...</p>
       ) : (
-        <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "rgba(0,212,255,0.12)" }}>
-          <table className="w-full text-sm">
-            <thead style={{ background: "rgba(0,212,255,0.08)" }}>
-              <tr>
-                {previewFields.map((f) => (
-                  <th key={f.name} className="px-4 py-3 text-left font-medium">{f.label}</th>
-                ))}
-                <th className="px-4 py-3 text-right" />
-              </tr>
-            </thead>
-            <tbody>
-              {items.length === 0 && (
+        <>
+          {/* ── Desktop : tableau ── */}
+          <div className="hidden md:block rounded-2xl border overflow-x-auto" style={{ borderColor: "rgba(0,212,255,0.12)" }}>
+            <table className="w-full text-sm">
+              <thead style={{ background: "rgba(0,212,255,0.08)" }}>
                 <tr>
-                  <td colSpan={previewFields.length + 1} className="px-4 py-6 text-center text-white/50">
-                    Aucun élément.
-                  </td>
-                </tr>
-              )}
-              {items.map((it) => (
-                <tr key={it._id} className="border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
                   {previewFields.map((f) => (
-                    <td key={f.name} className="px-4 py-3 align-top">
-                      <Cell value={it[f.name]} />
-                    </td>
+                    <th key={f.name} className="px-4 py-3 text-left font-medium">{f.label}</th>
                   ))}
-                  <td className="px-4 py-3 text-right whitespace-nowrap">
-                    <button
-                      type="button"
-                      onClick={() => { setCreating(false); setEditing(it); }}
-                      className="mr-2 rounded-full border px-3 py-1 text-xs text-white/80 hover:text-[#00d4ff] hover:border-[#00d4ff]"
-                      style={{ borderColor: "rgba(255,255,255,0.18)" }}
-                    >
-                      Modifier
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => onDelete(it._id)}
-                      className="rounded-full border px-3 py-1 text-xs text-red-400 hover:bg-red-500/10"
-                      style={{ borderColor: "rgba(248,113,113,0.4)" }}
-                    >
-                      Supprimer
-                    </button>
-                  </td>
+                  <th className="px-4 py-3 text-right" />
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {items.length === 0 && (
+                  <tr>
+                    <td colSpan={previewFields.length + 1} className="px-4 py-6 text-center text-white/50">
+                      Aucun élément.
+                    </td>
+                  </tr>
+                )}
+                {items.map((it) => (
+                  <tr key={it._id} className="border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+                    {previewFields.map((f) => (
+                      <td key={f.name} className="px-4 py-3 align-top">
+                        <Cell value={it[f.name]} />
+                      </td>
+                    ))}
+                    <td className="px-4 py-3 text-right whitespace-nowrap">
+                      <button
+                        type="button"
+                        onClick={() => { setCreating(false); setEditing(it); }}
+                        className="mr-2 rounded-full border px-3 py-1 text-xs text-white/80 hover:text-[#00d4ff] hover:border-[#00d4ff]"
+                        style={{ borderColor: "rgba(255,255,255,0.18)" }}
+                      >
+                        Modifier
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onDelete(it._id)}
+                        className="rounded-full border px-3 py-1 text-xs text-red-400 hover:bg-red-500/10"
+                        style={{ borderColor: "rgba(248,113,113,0.4)" }}
+                      >
+                        Supprimer
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* ── Mobile : cartes ── */}
+          <div className="md:hidden flex flex-col gap-3">
+            {items.length === 0 && (
+              <p className="px-4 py-6 text-center text-sm text-white/50">Aucun élément.</p>
+            )}
+            {items.map((it) => (
+              <div
+                key={it._id}
+                className="rounded-2xl border p-4 space-y-2"
+                style={{ borderColor: "rgba(0,212,255,0.12)", background: "rgba(255,255,255,0.03)" }}
+              >
+                {previewFields.map((f) => (
+                  <div key={f.name} className="flex flex-col gap-0.5">
+                    <span className="text-xs font-medium uppercase tracking-wider text-white/50">{f.label}</span>
+                    <span className="text-sm text-white/90 break-words">
+                      <Cell value={it[f.name]} />
+                    </span>
+                  </div>
+                ))}
+                <div className="flex gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => { setCreating(false); setEditing(it); }}
+                    className="flex-1 rounded-full border px-3 py-2 text-xs text-white/80 hover:text-[#00d4ff] hover:border-[#00d4ff]"
+                    style={{ borderColor: "rgba(255,255,255,0.18)" }}
+                  >
+                    Modifier
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onDelete(it._id)}
+                    className="flex-1 rounded-full border px-3 py-2 text-xs text-red-400 hover:bg-red-500/10"
+                    style={{ borderColor: "rgba(248,113,113,0.4)" }}
+                  >
+                    Supprimer
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );
@@ -234,7 +278,7 @@ function EntityForm({
         </div>
       )}
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
         {visibleFields.map((f) => (
           <label
             key={f.name}
@@ -365,11 +409,11 @@ function EntityForm({
         ))}
       </div>
 
-      <div className="flex justify-end gap-2 pt-2">
+      <div className="flex flex-col-reverse md:flex-row justify-end gap-3 pt-2">
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-full border px-4 py-2 text-sm text-white/80"
+          className="w-full md:w-auto rounded-full border px-4 py-2 text-sm text-white/80"
           style={{ borderColor: "rgba(255,255,255,0.18)" }}
         >
           Annuler
@@ -377,7 +421,7 @@ function EntityForm({
         <button
           type="submit"
           disabled={submitting}
-          className="rounded-full px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          className="w-full md:w-auto rounded-full px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
           style={{ background: "linear-gradient(135deg,#0066cc,#00d4ff)" }}
         >
           {submitting ? "..." : "Enregistrer"}
