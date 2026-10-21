@@ -54,7 +54,7 @@ export default function MaintenancePage() {
         </div>
       </header>
 
-      <main className="relative z-10 mx-auto grid max-w-6xl items-center gap-10 px-4 pb-16 pt-6 sm:px-6 sm:pt-10 lg:grid-cols-2 lg:gap-14 lg:pt-16">
+      <main className="relative z-10 mx-auto grid max-w-6xl items-center gap-6 px-4 pb-8 pt-2 sm:gap-10 sm:px-6 sm:pb-16 sm:pt-10 lg:grid-cols-2 lg:gap-14 lg:pt-16">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -62,7 +62,7 @@ export default function MaintenancePage() {
           className="flex flex-col items-center text-center lg:items-start lg:text-left"
         >
           {/* Icône engrenage animée */}
-          <div className="relative mb-8 grid h-24 w-24 place-items-center rounded-3xl border border-[color:var(--border-strong)] bg-[color:var(--surface)] text-phi-cyan">
+          <div className="relative mb-8 hidden h-24 w-24 place-items-center sm:grid rounded-3xl border border-[color:var(--border-strong)] bg-[color:var(--surface)] text-phi-cyan">
             <svg
               viewBox="0 0 24 24"
               width="44"
@@ -80,7 +80,7 @@ export default function MaintenancePage() {
             </svg>
           </div>
 
-          <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-[color:var(--border-strong)] bg-[color:var(--surface)] px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-phi-cyan">
+          <span className="mb-3 inline-flex sm:mb-5 items-center gap-2 rounded-full border border-[color:var(--border-strong)] bg-[color:var(--surface)] px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-phi-cyan">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-phi-cyan opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-phi-cyan" />
@@ -88,16 +88,16 @@ export default function MaintenancePage() {
             {c.badge}
           </span>
 
-          <h1 className="font-display text-3xl font-bold leading-tight sm:text-5xl">
+          <h1 className="font-display text-2xl font-bold leading-tight sm:text-5xl">
             {c.title}
           </h1>
-          <p className="mt-5 max-w-xl text-base text-foreground/70 sm:text-lg">
+          <p className="mt-3 max-w-xl text-sm text-foreground/70 sm:mt-5 sm:text-lg">
             {c.text}
           </p>
 
           {/* Barre de progression indéterminée */}
           <div
-            className="mt-8 h-1.5 w-full max-w-xs overflow-hidden rounded-full bg-[color:var(--surface-muted)]"
+            className="mt-8 hidden h-1.5 w-full max-w-xs overflow-hidden sm:block rounded-full bg-[color:var(--surface-muted)]"
             role="progressbar"
             aria-label={c.badge}
           >
@@ -110,15 +110,15 @@ export default function MaintenancePage() {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="w-full rounded-3xl border border-[color:var(--border)] bg-[color:var(--surface)] p-6 text-left sm:p-8"
+          className="w-full rounded-3xl border border-[color:var(--border)] bg-[color:var(--surface)] p-4 text-left sm:p-8"
         >
           <h2 className="font-display text-xl font-semibold">{c.contactTitle}</h2>
-          <p className="mt-1 text-sm text-foreground/60">{c.contactText}</p>
+          <p className="mt-1 hidden text-sm text-foreground/60 sm:block">{c.contactText}</p>
 
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          <div className="mt-3 grid gap-2 sm:mt-6 sm:grid-cols-2 sm:gap-3">
             <a
               href={`mailto:${SITE.email}`}
-              className="flex items-center gap-3 rounded-2xl border border-[color:var(--border)] p-4 transition-colors hover:border-phi-cyan/60"
+              className="flex items-center gap-3 rounded-2xl border border-[color:var(--border)] p-3 sm:p-4 transition-colors hover:border-phi-cyan/60"
             >
               <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-phi-gradient-soft text-phi-cyan">
                 <Icon name="mail" size={18} />
@@ -137,7 +137,7 @@ export default function MaintenancePage() {
                 href={i === 0 ? whatsapp : `tel:${p.replace(/\s+/g, "")}`}
                 target={i === 0 ? "_blank" : undefined}
                 rel={i === 0 ? "noopener noreferrer" : undefined}
-                className="flex items-center gap-3 rounded-2xl border border-[color:var(--border)] p-4 transition-colors hover:border-phi-cyan/60"
+                className="flex items-center gap-3 rounded-2xl border border-[color:var(--border)] p-3 sm:p-4 transition-colors hover:border-phi-cyan/60"
               >
                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-phi-gradient-soft text-phi-cyan">
                   <Icon name="phone" size={18} />
@@ -152,7 +152,7 @@ export default function MaintenancePage() {
             ))}
           </div>
 
-          <div className="mt-6 flex flex-col items-start gap-3 border-t border-[color:var(--border)] pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-3 flex items-center justify-between gap-3 border-t border-[color:var(--border)] pt-3 sm:mt-6 sm:pt-6 sm:flex-row sm:items-center sm:justify-between">
             <span className="text-sm font-medium text-foreground/70">{c.follow}</span>
             <ul className="flex items-center gap-3">
               {SOCIALS.map((s) => (
