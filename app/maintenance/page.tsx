@@ -54,12 +54,12 @@ export default function MaintenancePage() {
         </div>
       </header>
 
-      <main className="relative z-10 mx-auto flex max-w-3xl flex-col items-center px-4 pb-16 pt-6 text-center sm:px-6 sm:pt-12">
+      <main className="relative z-10 mx-auto grid max-w-6xl items-center gap-10 px-4 pb-16 pt-6 sm:px-6 sm:pt-10 lg:grid-cols-2 lg:gap-14 lg:pt-16">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="flex flex-col items-center"
+          className="flex flex-col items-center text-center lg:items-start lg:text-left"
         >
           {/* Icône engrenage animée */}
           <div className="relative mb-8 grid h-24 w-24 place-items-center rounded-3xl border border-[color:var(--border-strong)] bg-[color:var(--surface)] text-phi-cyan">
@@ -110,7 +110,7 @@ export default function MaintenancePage() {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="mt-14 w-full rounded-3xl border border-[color:var(--border)] bg-[color:var(--surface)] p-6 text-left sm:p-8"
+          className="w-full rounded-3xl border border-[color:var(--border)] bg-[color:var(--surface)] p-6 text-left sm:p-8"
         >
           <h2 className="font-display text-xl font-semibold">{c.contactTitle}</h2>
           <p className="mt-1 text-sm text-foreground/60">{c.contactText}</p>
@@ -172,11 +172,14 @@ export default function MaintenancePage() {
           </div>
         </motion.section>
 
-        <p className="mt-10 text-sm text-foreground/60">{c.thanks}</p>
+      </main>
+
+      <footer className="relative z-10 pb-10 text-center">
+        <p className="text-sm text-foreground/60">{c.thanks}</p>
         <p className="mt-2 text-xs text-foreground/40">
           © {new Date().getFullYear()} {SITE.name} · {SITE.location}
         </p>
-      </main>
+      </footer>
 
       <style>{`
         @keyframes maint-slide {

@@ -67,10 +67,6 @@ export const metadata: Metadata = {
     description: SITE.description,
     images: ["/phibrain-logo.png"],
   },
-  icons: {
-    icon: "/phibrain-logo.png",
-    apple: "/phibrain-logo.png",
-  },
   robots: { index: true, follow: true },
 };
 

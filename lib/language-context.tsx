@@ -29,10 +29,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      // 2. Sinon : langue du navigateur/appareil
-      const browserLang = (navigator.language ?? navigator.languages?.[0] ?? "fr").toLowerCase();
-      setLangState(browserLang.startsWith("fr") ? "fr" : "en");
-
+      // 2. Sinon : français par défaut (aucune détection de la langue du navigateur)
     } catch {
       /* localStorage indisponible (mode privé strict, etc.) */
     }
