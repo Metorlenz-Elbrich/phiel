@@ -9,13 +9,14 @@ export function ConditionalLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const isAdmin = pathname?.startsWith("/admin");
+  const hideChrome =
+    pathname?.startsWith("/admin") || pathname?.startsWith("/maintenance");
 
   return (
     <>
-      {!isAdmin && <NavBar />}
+      {!hideChrome && <NavBar />}
       {children}
-      {!isAdmin && <Footer />}
+      {!hideChrome && <Footer />}
     </>
   );
 }
