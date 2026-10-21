@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { SITE, SOCIALS } from "@/lib/data";
 import { useLang } from "@/lib/language-context";
-import { Logo } from "@/components/ui/logo";
 import { Icon, type IconName } from "@/components/ui/icon";
 import { LangToggle } from "@/components/ui/lang-toggle";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -47,7 +46,12 @@ export default function MaintenancePage() {
       </div>
 
       <header className="relative z-10 mx-auto flex max-w-5xl items-center justify-between px-4 py-5 sm:px-6">
-        <Logo height={44} />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/phibrain-logo-entete.png"
+          alt="PhiBrain Inc"
+          className="h-12 w-auto rounded-lg dark:bg-white dark:p-1"
+        />
         <div className="flex items-center gap-2">
           <LangToggle />
           <ThemeToggle />
@@ -61,8 +65,9 @@ export default function MaintenancePage() {
           transition={{ duration: 0.6 }}
           className="flex flex-col items-center text-center lg:items-start lg:text-left"
         >
-          {/* Icône engrenage animée */}
-          <div className="relative mb-8 hidden h-24 w-24 place-items-center sm:grid rounded-3xl border border-[color:var(--border-strong)] bg-[color:var(--surface)] text-phi-cyan">
+          {/* Engrenage animé + logo */}
+          <div className="mb-5 flex items-center gap-4 sm:mb-8">
+          <div className="relative grid h-20 w-20 shrink-0 place-items-center rounded-3xl sm:h-24 sm:w-24 border border-[color:var(--border-strong)] bg-[color:var(--surface)] text-phi-cyan">
             <svg
               viewBox="0 0 24 24"
               width="44"
@@ -72,12 +77,21 @@ export default function MaintenancePage() {
               strokeWidth="1.6"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="animate-[spin_8s_linear_infinite]"
+              className="h-9 w-9 animate-[spin_8s_linear_infinite] sm:h-11 sm:w-11"
               aria-hidden
             >
               <circle cx="12" cy="12" r="3" />
               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
             </svg>
+          </div>
+          <div className="grid h-20 w-20 shrink-0 place-items-center rounded-3xl border border-[color:var(--border-strong)] bg-white p-2 sm:h-24 sm:w-24 sm:p-2.5">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/phibrain-logo-entete.png"
+              alt="PhiBrain Inc"
+              className="h-full w-full object-contain"
+            />
+          </div>
           </div>
 
           <span className="mb-3 inline-flex sm:mb-5 items-center gap-2 rounded-full border border-[color:var(--border-strong)] bg-[color:var(--surface)] px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-phi-cyan">
