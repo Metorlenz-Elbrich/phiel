@@ -5,7 +5,7 @@ export const SITE = {
   description:
     "PhiBrain Inc — agence tech qui conçoit des sites web, des applications mobiles et des identités de marque qui mêlent design, IA et performance.",
   tagline: "Là où la créativité rencontre l'intelligence.",
-  email: "phibraininc@gmail.com",
+  email: "contact.cmr@phi-brain-inc.com",
   phones: ["+237 696 41 57 59", "+237 657 23 55 96"],
   location: "Douala · Yaoundé · Cameroun",
 };
